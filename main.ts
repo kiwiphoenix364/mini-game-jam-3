@@ -28,6 +28,16 @@ function configure () {
 renderer.setZClipFar(zFar)
 controller.player1.analog = true
 }
+controller.player2.onButtonEvent(ControllerButton.Down, ControllerButtonEvent.Pressed, function () {
+    cameraOffset += 180
+    heading += 180
+    mirroring = true
+})
+controller.player2.onButtonEvent(ControllerButton.Down, ControllerButtonEvent.Released, function () {
+    cameraOffset += 180
+    heading += 180
+    mirroring = false
+})
 controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
     stats.turnStats(true)
 })
@@ -36,10 +46,15 @@ let carVx = 0
 let fwdY = 0
 let fwdX = 0
 let carPower = 0
+let mirroring = false
 let treeY: number[] = []
 let treeX: number[] = []
+let cameraOffset = 0
 let heading = 0
 let trackImage: Image = null
+let arrayx2: number[] = []
+let arrayy2: number[] = []
+let arrayh2: number[] = []
 game.splash("Please Wait...", "A Few Seconds")
 let carAngularVelocity = 0
 let throttle = 0
@@ -325,6 +340,14 @@ let arrayh = [
 2,
 3
 ]
+heading = 180
+timer.background(function () {
+    for (let index = 0; index < 360; index++) {
+        pause(1)
+        cameraOffset += -1
+        heading += 1
+    }
+})
 game.onUpdate(function () {
     mySprite.setImage(img`
         ................................................................................................................................................................
@@ -450,15 +473,38 @@ game.onUpdate(function () {
         `)
     for (let index7 = 0; index7 <= arrayx.length / 2; index7++) {
         if (index7 < 12) {
-            renderer.place3dLine(1, px + arrayx[index7 * 2] * Math.cos((heading + 0) * Math.PI / 180), py + arrayy[index7 * 2] * (0 - Math.sin((heading + 0) * Math.PI / 180)), arrayh[index7 * 2], px + arrayx[index7 * 2 + 1] * Math.cos((heading + 0) * Math.PI / 180), py + arrayy[index7 * 2 + 1] * (0 - Math.sin((heading + 0) * Math.PI / 180)), arrayh[index7 * 2 + 1])
+            renderer.place3dLine(1, px + (arrayx[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2], px + (arrayx[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2 + 1])
         } else {
-            renderer.place3dLine(9, px + arrayx[index7 * 2] * Math.cos((heading + 0) * Math.PI / 180), py + arrayy[index7 * 2] * (0 - Math.sin((heading + 0) * Math.PI / 180)), arrayh[index7 * 2], px + arrayx[index7 * 2 + 1] * Math.cos((heading + 0) * Math.PI / 180), py + arrayy[index7 * 2 + 1] * (0 - Math.sin((heading + 0) * Math.PI / 180)), arrayh[index7 * 2 + 1])
+            renderer.place3dLine(9, px + (arrayx[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2], px + (arrayx[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2 + 1])
+        }
+    }
+    for (let index = 0; index <= 5; index++) {
+        arrayx2.push(px + (arrayx[index * 2 + 24] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index * 2 + 24] * Math.sin((heading + cameraOffset) * Math.PI / 180)))
+        arrayx2.push(px + (arrayx[index * 2 + (24 + 1)] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index * 2 + (24 + 1)] * Math.sin((heading + cameraOffset) * Math.PI / 180)))
+        arrayy2.push(py + (arrayy[index * 2 + 24] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index * 2 + 24] * Math.sin((heading + cameraOffset) * Math.PI / 180)))
+        arrayy2.push(py + (arrayy[index * 2 + (24 + 1)] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index * 2 + (24 + 1)] * Math.sin((heading + cameraOffset) * Math.PI / 180)))
+        arrayh2.push(arrayh[index * 2 + 24])
+        arrayh2.push(arrayh[index * 2 + (24 + 1)])
+    }
+    for (let index7 = 0; index7 <= arrayx2.length / 2; index7++) {
+        renderer.place3dLine(9, arrayx2[index7 * 2], arrayy2[index7 * 2], arrayh2[index7 * 2], arrayx2[index7 * 2 + 1], arrayy2[index7 * 2 + 1], arrayh2[index7 * 2 + 1])
+        renderer.place3dLine(9, arrayx2[index7 * 2], arrayy2[index7 * 2], arrayh2[index7 * 2], arrayx2[index7 * 2 + 12], arrayy2[index7 * 2 + 12], arrayh2[index7 * 2 + 12])
+    }
+    if (arrayx2.length >= 36) {
+        for (let index = 0; index < 12; index++) {
+            arrayx2.shift()
+            arrayy2.shift()
+            arrayh2.shift()
         }
     }
 })
 game.onUpdate(function () {
     heading += controller.player2.dx()
-    carPower = controller.dy(-25)
+    if (mirroring) {
+        carPower = controller.dy(15)
+    } else {
+        carPower = controller.dy(-15)
+    }
     if (heading < 0) {
         heading += 360
     }
@@ -469,8 +515,13 @@ game.onUpdate(function () {
     fwdY = 0 - Math.cos(heading * Math.PI / 180)
     carVx += carPower * fwdX
     carVy += carPower * fwdY
-    carVx += controller.dx(-25) * Math.sin((heading + 270) * Math.PI / 180)
-    carVy += controller.dx(-25) * (0 - Math.cos((heading + 270) * Math.PI / 180))
+    if (mirroring) {
+        carVx += controller.dx(15) * Math.sin((heading + 270) * Math.PI / 180)
+        carVy += controller.dx(15) * (0 - Math.cos((heading + 270) * Math.PI / 180))
+    } else {
+        carVx += controller.dx(-15) * Math.sin((heading + 270) * Math.PI / 180)
+        carVy += controller.dx(-15) * (0 - Math.cos((heading + 270) * Math.PI / 180))
+    }
     px += carVx
     py += carVy
     carVx += 0 - carVx / 10
@@ -481,4 +532,7 @@ game.onUpdate(function () {
     if (py < 0) {
         py = 0
     }
+})
+game.onUpdateInterval(50, function () {
+	
 })
