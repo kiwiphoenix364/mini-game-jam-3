@@ -448,7 +448,7 @@ game.onUpdate(function () {
         ................................................................................................................................................................
         ................................................................................................................................................................
         `)
-    for (let index7 = 0; index7 <= 2; index7++) {
+    for (let index7 = 0; index7 <= arrayx.length / 2; index7++) {
         if (index7 < 12) {
             renderer.place3dLine(1, px + arrayx[index7 * 2] * Math.cos((heading + 0) * Math.PI / 180), py + arrayy[index7 * 2] * (0 - Math.sin((heading + 0) * Math.PI / 180)), arrayh[index7 * 2], px + arrayx[index7 * 2 + 1] * Math.cos((heading + 0) * Math.PI / 180), py + arrayy[index7 * 2 + 1] * (0 - Math.sin((heading + 0) * Math.PI / 180)), arrayh[index7 * 2 + 1])
         } else {
