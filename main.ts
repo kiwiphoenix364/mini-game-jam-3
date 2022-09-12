@@ -46,6 +46,7 @@ let carVx = 0
 let fwdY = 0
 let fwdX = 0
 let carPower = 0
+let coinRotation = 0
 let mirroring = false
 let treeY: number[] = []
 let treeX: number[] = []
@@ -189,7 +190,6 @@ let ballImage = assets.image`ball`
 tiles.setCurrentTilemap(tilemap`level1`)
 trackImage = image.create(4080, 4080)
 redrawImg.GenerateImage()
-tileUtil.unloadTilemap()
 configure()
 let carSprite = sprites.create(assets.image`car`, SpriteKind.Player)
 carSprite.z = 200
@@ -348,6 +348,36 @@ timer.background(function () {
         heading += 1
     }
 })
+let coinX: number[] = []
+let coinY: number[] = []
+let coinH: number[] = []
+for (let index = 0; index <= 7; index++) {
+    coinX.push((0 - Math.cos(45 * index * Math.PI / 180)) * 8)
+    coinH.push(Math.sin(45 * index * Math.PI / 180) * 8)
+    coinY.push(-1)
+    coinX.push((0 - Math.cos(45 * (index + 1) * Math.PI / 180)) * 8)
+    coinH.push(Math.sin(45 * (index + 1) * Math.PI / 180) * 8)
+    coinY.push(-1)
+    coinX.push((0 - Math.cos(45 * index * Math.PI / 180)) * 8)
+    coinH.push(Math.sin(45 * index * Math.PI / 180) * 8)
+    coinY.push(1)
+    coinX.push((0 - Math.cos(45 * (index + 1) * Math.PI / 180)) * 8)
+    coinH.push(Math.sin(45 * (index + 1) * Math.PI / 180) * 8)
+    coinY.push(1)
+    coinX.push((0 - Math.cos(45 * index * Math.PI / 180)) * 8)
+    coinH.push(Math.sin(45 * index * Math.PI / 180) * 8)
+    coinY.push(1)
+    coinX.push((0 - Math.cos(45 * index * Math.PI / 180)) * 8)
+    coinH.push(Math.sin(45 * index * Math.PI / 180) * 8)
+    coinY.push(-1)
+}
+let coinXMap: number[] = []
+let coinYMap: number[] = []
+for (let value of tiles.getTilesByType(assets.tile`myTile`)) {
+    coinXMap.push(value.x + 0)
+    coinYMap.push(value.y + 0)
+}
+tileUtil.unloadTilemap()
 game.onUpdate(function () {
     mySprite.setImage(img`
         ................................................................................................................................................................
@@ -471,6 +501,11 @@ game.onUpdate(function () {
         ................................................................................................................................................................
         ................................................................................................................................................................
         `)
+    for (let index = 0; index <= coinXMap.length; index++) {
+        for (let index7 = 0; index7 <= coinX.length / 2; index7++) {
+            renderer.place3dLine(7, coinXMap[index] + (coinX[index7 * 2] * Math.cos(coinRotation * Math.PI / 180) - coinY[index7 * 2] * Math.sin(coinRotation * Math.PI / 180)), coinYMap[index] + (coinY[index7 * 2] * Math.cos(coinRotation * Math.PI / 180) + coinX[index7 * 2] * Math.sin(coinRotation * Math.PI / 180)), coinH[index7 * 2], coinXMap[index] + (coinX[index7 * 2 + 1] * Math.cos(coinRotation * Math.PI / 180) - coinY[index7 * 2 + 1] * Math.sin(coinRotation * Math.PI / 180)), coinYMap[index] + (coinY[index7 * 2 + 1] * Math.cos(coinRotation * Math.PI / 180) + coinX[index7 * 2 + 1] * Math.sin(coinRotation * Math.PI / 180)), coinH[index7 * 2 + 1])
+        }
+    }
     for (let index7 = 0; index7 <= arrayx.length / 2; index7++) {
         if (index7 < 12) {
             renderer.place3dLine(1, px + (arrayx[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2], px + (arrayx[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2 + 1])
@@ -497,14 +532,14 @@ game.onUpdate(function () {
             arrayh2.shift()
         }
     }
+    coinRotation += 1
 })
 game.onUpdate(function () {
-    heading += controller.dx()
     if (mirroring) {
-        carPower = controller.dy(5)
-    } else {
-        carPower = controller.dy(-5)
+        heading += 180
     }
+    heading += controller.dx()
+    carPower = controller.dy(-5)
     if (heading < 0) {
         heading += 360
     }
@@ -515,23 +550,18 @@ game.onUpdate(function () {
     fwdY = 0 - Math.cos(heading * Math.PI / 180)
     carVx += carPower * fwdX
     carVy += carPower * fwdY
-    if (mirroring) {
-        carVx += carPower * controller.dx(55) * Math.sin((heading + 270) * Math.PI / 180)
-        carVy += carPower * controller.dx(55) * (0 - Math.cos((heading + 270) * Math.PI / 180))
-    } else {
-        carVx += carPower * controller.dx(-55) * Math.sin((heading + 270) * Math.PI / 180)
-        carVy += carPower * controller.dx(-55) * (0 - Math.cos((heading + 270) * Math.PI / 180))
-    }
+    carVx += carPower * controller.dx(-55) * Math.sin((heading + 270) * Math.PI / 180)
+    carVy += carPower * controller.dx(-55) * (0 - Math.cos((heading + 270) * Math.PI / 180))
     carVx += Math.sin(heading * Math.PI / 180) / 50 * carPower
     carVy += (0 - Math.cos(heading * Math.PI / 180)) / 50 * carPower
+    carVx += 0 - carVx / 35
+    carVy += 0 - carVy / 35
     if (carVx > 0.04 && carVx < -0.04) {
     	
     }
     if (carVy > 0.04 && carVy < -0.04) {
     	
     }
-    carVx += 0 - carVx / 35
-    carVy += 0 - carVy / 35
     px += carVx
     py += carVy
     if (carVx > -0.04 && carVx < 0.04) {
@@ -545,6 +575,15 @@ game.onUpdate(function () {
     }
     if (py < 0) {
         py = 0
+    }
+    if (mirroring) {
+        heading += -180
+    }
+    if (heading < 0) {
+        heading += 360
+    }
+    if (heading >= 360) {
+        heading += 0 - 360
     }
 })
 game.onUpdateInterval(50, function () {
