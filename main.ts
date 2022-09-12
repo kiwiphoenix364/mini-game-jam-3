@@ -490,7 +490,7 @@ game.onUpdate(function () {
         renderer.place3dLine(9, arrayx2[index7 * 2], arrayy2[index7 * 2], arrayh2[index7 * 2], arrayx2[index7 * 2 + 1], arrayy2[index7 * 2 + 1], arrayh2[index7 * 2 + 1])
         renderer.place3dLine(9, arrayx2[index7 * 2], arrayy2[index7 * 2], arrayh2[index7 * 2], arrayx2[index7 * 2 + 12], arrayy2[index7 * 2 + 12], arrayh2[index7 * 2 + 12])
     }
-    if (arrayx2.length >= 36) {
+    if (arrayx2.length >= 48) {
         for (let index = 0; index < 12; index++) {
             arrayx2.shift()
             arrayy2.shift()
@@ -499,11 +499,11 @@ game.onUpdate(function () {
     }
 })
 game.onUpdate(function () {
-    heading += controller.player2.dx()
+    heading += controller.dx()
     if (mirroring) {
-        carPower = controller.dy(15)
+        carPower = controller.dy(5)
     } else {
-        carPower = controller.dy(-15)
+        carPower = controller.dy(-5)
     }
     if (heading < 0) {
         heading += 360
@@ -516,16 +516,30 @@ game.onUpdate(function () {
     carVx += carPower * fwdX
     carVy += carPower * fwdY
     if (mirroring) {
-        carVx += controller.dx(15) * Math.sin((heading + 270) * Math.PI / 180)
-        carVy += controller.dx(15) * (0 - Math.cos((heading + 270) * Math.PI / 180))
+        carVx += carPower * controller.dx(55) * Math.sin((heading + 270) * Math.PI / 180)
+        carVy += carPower * controller.dx(55) * (0 - Math.cos((heading + 270) * Math.PI / 180))
     } else {
-        carVx += controller.dx(-15) * Math.sin((heading + 270) * Math.PI / 180)
-        carVy += controller.dx(-15) * (0 - Math.cos((heading + 270) * Math.PI / 180))
+        carVx += carPower * controller.dx(-55) * Math.sin((heading + 270) * Math.PI / 180)
+        carVy += carPower * controller.dx(-55) * (0 - Math.cos((heading + 270) * Math.PI / 180))
     }
+    carVx += Math.sin(heading * Math.PI / 180) / 50 * carPower
+    carVy += (0 - Math.cos(heading * Math.PI / 180)) / 50 * carPower
+    if (carVx > 0.04 && carVx < -0.04) {
+    	
+    }
+    if (carVy > 0.04 && carVy < -0.04) {
+    	
+    }
+    carVx += 0 - carVx / 35
+    carVy += 0 - carVy / 35
     px += carVx
     py += carVy
-    carVx += 0 - carVx / 10
-    carVy += 0 - carVy / 10
+    if (carVx > -0.04 && carVx < 0.04) {
+        carVx = 0
+    }
+    if (carVy > -0.04 && carVy < 0.04) {
+        carVy = 0
+    }
     if (px < 0) {
         px = 0
     }
