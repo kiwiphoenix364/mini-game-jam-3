@@ -23,6 +23,23 @@ function initializeTrack () {
         }
     }
 }
+controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
+    timer.background(function () {
+        for (let index = 0; index < 20; index++) {
+            carYOffset += -0.16
+            pause(1)
+        }
+        for (let index = 0; index < 20; index++) {
+            carYOffset += 0.16
+            pause(1)
+        }
+    })
+    if (controller.left.isPressed()) {
+        drift = "l"
+    } else if (controller.right.isPressed()) {
+        drift = "r"
+    }
+})
 function configure () {
     renderer.setBackgroundImage(assets.image`background`)
 renderer.setZClipFar(zFar)
@@ -41,13 +58,18 @@ controller.player2.onButtonEvent(ControllerButton.Down, ControllerButtonEvent.Re
 controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
     stats.turnStats(true)
 })
+controller.B.onEvent(ControllerButtonEvent.Released, function () {
+    drift = ""
+})
 let carVy = 0
 let carVx = 0
+let carPower = 0
 let fwdY = 0
 let fwdX = 0
-let carPower = 0
 let coinRotation = 0
 let mirroring = false
+let drift = ""
+let carYOffset = 0
 let treeY: number[] = []
 let treeX: number[] = []
 let cameraOffset = 0
@@ -508,9 +530,9 @@ game.onUpdate(function () {
     }
     for (let index7 = 0; index7 <= arrayx.length / 2; index7++) {
         if (index7 < 12) {
-            renderer.place3dLine(1, px + (arrayx[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2], px + (arrayx[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2 + 1])
+            renderer.place3dLine(1, px + (arrayx[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2] - carYOffset, px + (arrayx[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2 + 1] - carYOffset)
         } else {
-            renderer.place3dLine(9, px + (arrayx[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2], px + (arrayx[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2 + 1])
+            renderer.place3dLine(9, px + (arrayx[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2] - carYOffset, px + (arrayx[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2 + 1] - carYOffset)
         }
     }
     for (let index = 0; index <= 5; index++) {
@@ -535,10 +557,22 @@ game.onUpdate(function () {
     coinRotation += 1
 })
 game.onUpdate(function () {
+    if (drift == "l") {
+        fwdX = Math.sin((heading + -90) * Math.PI / 180)
+        fwdY = 0 - Math.cos((heading + -90) * Math.PI / 180)
+        heading += carPower * 2 * controller.dx(50)
+    } else if (drift == "r") {
+        fwdX = Math.sin((heading + 90) * Math.PI / 180)
+        fwdY = 0 - Math.cos((heading + 90) * Math.PI / 180)
+        heading += carPower * 2 * controller.dx(50)
+    } else {
+        fwdX = Math.sin(heading * Math.PI / 180)
+        fwdY = 0 - Math.cos(heading * Math.PI / 180)
+        heading += carPower * 2 * controller.dx(300)
+    }
     if (mirroring) {
         heading += 180
     }
-    heading += controller.dx()
     carPower = controller.dy(-5)
     if (heading < 0) {
         heading += 360
@@ -546,16 +580,27 @@ game.onUpdate(function () {
     if (heading >= 360) {
         heading += 0 - 360
     }
-    fwdX = Math.sin(heading * Math.PI / 180)
-    fwdY = 0 - Math.cos(heading * Math.PI / 180)
     carVx += carPower * fwdX
     carVy += carPower * fwdY
-    carVx += carPower * controller.dx(-55) * Math.sin((heading + 270) * Math.PI / 180)
-    carVy += carPower * controller.dx(-55) * (0 - Math.cos((heading + 270) * Math.PI / 180))
+    if (drift == "l") {
+        carVx += carPower * -1 * Math.sin((heading + 270) * Math.PI / 180)
+        carVy += carPower * -1 * (0 - Math.cos((heading + 270) * Math.PI / 180))
+    } else if (drift == "r") {
+        carVx += (0 - carPower * 1) * Math.sin((heading + 270) * Math.PI / 180)
+        carVy += (0 - carPower * 1) * (0 - Math.cos((heading + 270) * Math.PI / 180))
+    } else {
+        carVx += carPower * controller.dx(0) * Math.sin((heading + 270) * Math.PI / 180)
+        carVy += carPower * controller.dx(0) * (0 - Math.cos((heading + 270) * Math.PI / 180))
+    }
     carVx += Math.sin(heading * Math.PI / 180) / 50 * carPower
     carVy += (0 - Math.cos(heading * Math.PI / 180)) / 50 * carPower
-    carVx += 0 - carVx / 35
-    carVy += 0 - carVy / 35
+    if (drift == "l" || drift == "r") {
+        carVx += 0 - carVx / 35
+        carVy += 0 - carVy / 35
+    } else {
+        carVx += 0 - carVx / 55
+        carVy += 0 - carVy / 55
+    }
     if (carVx > 0.04 && carVx < -0.04) {
     	
     }
