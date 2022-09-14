@@ -77,6 +77,10 @@ let treeX: number[] = []
 let cameraOffset = 0
 let heading = 0
 let trackImage: Image = null
+tiles.setCurrentTilemap(tilemap`level1`)
+trackImage = image.create(4080, 4080)
+redrawImg.GenerateImage()
+configure()
 let arrayx2: number[] = []
 let arrayy2: number[] = []
 let arrayh2: number[] = []
@@ -209,12 +213,6 @@ let mySprite = sprites.create(img`
     `, SpriteKind.Player)
 mySprite.setFlag(SpriteFlag.RelativeToCamera, true)
 mySprite.z = 500
-let treeImage = assets.image`tree`
-let ballImage = assets.image`ball`
-tiles.setCurrentTilemap(tilemap`level1`)
-trackImage = image.create(4080, 4080)
-redrawImg.GenerateImage()
-configure()
 let carSprite = sprites.create(assets.image`car`, SpriteKind.Player)
 carSprite.z = 200
 let pxPrev = px
@@ -239,14 +237,6 @@ let carDragSidewaysDrift = 0.04
 let carDragOffroad = 0.2
 let carAngularDrag = 0.85
 let carAngularDragDrift = 0.95
-setUpTrack2()
-initializeTrack()
-enum TerrainType {
-    ROAD,
-    OFFROAD,
-    OBSTACLE,
-    FINISH_LINE
-}
 let hOffset = -18
 let hJumpSpeed = -20
 let hAccel = 0.2
@@ -372,6 +362,10 @@ timer.background(function () {
         heading += 1
     }
 })
+let objx: number[] = []
+let objy: number[] = []
+let objh: number[] = []
+let objtype: Image[] = []
 let coinX: number[] = []
 let coinY: number[] = []
 let coinH: number[] = []
@@ -401,6 +395,8 @@ for (let value of tiles.getTilesByType(assets.tile`myTile`)) {
     coinXMap.push(value.x + 0)
     coinYMap.push(value.y + 0)
 }
+setUpTrack2()
+initializeTrack()
 tileUtil.unloadTilemap()
 game.onUpdate(function () {
     mySprite.setImage(img`
@@ -525,6 +521,30 @@ game.onUpdate(function () {
         ................................................................................................................................................................
         ................................................................................................................................................................
         `)
+    if (drift != "" && Math.percentChance(3)) {
+        objx.push(px)
+        objy.push(py)
+        objh.push(randint(4, 6))
+        if (Math.percentChance(50)) {
+            objtype.push(img`
+                . . 1 1 . . 
+                . 1 1 1 . . 
+                1 1 1 1 1 . 
+                d 1 1 1 1 1 
+                . d d 1 d d 
+                . . . d . . 
+                `)
+        } else {
+            objtype.push(img`
+                . . 1 1 1 . 
+                1 1 1 1 1 1 
+                d 1 1 1 1 d 
+                . 1 1 1 d . 
+                . d d d . . 
+                . . . . . . 
+                `)
+        }
+    }
     for (let index = 0; index <= coinXMap.length; index++) {
         for (let index7 = 0; index7 <= coinX.length / 2; index7++) {
             renderer.place3dLine(7, coinXMap[index] + (coinX[index7 * 2] * Math.cos(coinRotation * Math.PI / 180) - coinY[index7 * 2] * Math.sin(coinRotation * Math.PI / 180)), coinYMap[index] + (coinY[index7 * 2] * Math.cos(coinRotation * Math.PI / 180) + coinX[index7 * 2] * Math.sin(coinRotation * Math.PI / 180)), coinH[index7 * 2], coinXMap[index] + (coinX[index7 * 2 + 1] * Math.cos(coinRotation * Math.PI / 180) - coinY[index7 * 2 + 1] * Math.sin(coinRotation * Math.PI / 180)), coinYMap[index] + (coinY[index7 * 2 + 1] * Math.cos(coinRotation * Math.PI / 180) + coinX[index7 * 2 + 1] * Math.sin(coinRotation * Math.PI / 180)), coinH[index7 * 2 + 1])
@@ -557,6 +577,9 @@ game.onUpdate(function () {
         }
     }
     coinRotation += 1
+    for (let index = 0; index <= objx.length; index++) {
+        renderer.place3dImage(objtype[index], objx[index], objy[index], objh[index], 1)
+    }
 })
 game.onUpdate(function () {
     if (mirroring) {
