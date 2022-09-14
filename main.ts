@@ -365,7 +365,9 @@ timer.background(function () {
 let objx: number[] = []
 let objy: number[] = []
 let objh: number[] = []
-let objtype: Image[] = []
+let objtype = [img`
+    . 
+    `]
 let coinX: number[] = []
 let coinY: number[] = []
 let coinH: number[] = []
@@ -521,7 +523,7 @@ game.onUpdate(function () {
         ................................................................................................................................................................
         ................................................................................................................................................................
         `)
-    if (drift != "" && Math.percentChance(3)) {
+    if (drift == "r" && Math.percentChance(100)) {
         objx.push(px)
         objy.push(py)
         objh.push(randint(4, 6))
@@ -578,8 +580,27 @@ game.onUpdate(function () {
     }
     coinRotation += 1
     for (let index = 0; index <= objx.length; index++) {
-        renderer.place3dImage(objtype[index], objx[index], objy[index], objh[index], 1)
+        renderer.place3dImage(objtype[index], objx[index], objy[index], objh[index], 100)
     }
+    info.setScore(objx.length)
+    renderer.place3dImage(img`
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
+        `, 0, 0, 0, 1)
 })
 game.onUpdate(function () {
     if (mirroring) {
@@ -661,4 +682,9 @@ game.onUpdate(function () {
 })
 game.onUpdateInterval(50, function () {
 	
+})
+forever(function () {
+    for (let index = 0; index <= objx.length; index++) {
+    	
+    }
 })
