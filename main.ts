@@ -9,6 +9,9 @@ function drawSprites () {
     for (let i = 0; i <= treeX.length; i++) {
     	
     }
+    for (let index = 0; index <= objx.length - 1; index++) {
+        renderer.place3dImage(objtype[index], objx[index], objy[index], objh[index], objtype[index].width)
+    }
 }
 // console.log("Number of trees=" + treeX.length)
 function initializeTrack () {
@@ -74,6 +77,10 @@ let drift = ""
 let carYOffset = 0
 let treeY: number[] = []
 let treeX: number[] = []
+let objtype: Image[] = []
+let objh: number[] = []
+let objy: number[] = []
+let objx: number[] = []
 let cameraOffset = 0
 let heading = 0
 let trackImage: Image = null
@@ -362,12 +369,11 @@ timer.background(function () {
         heading += 1
     }
 })
-let objx: number[] = []
-let objy: number[] = []
-let objh: number[] = []
-let objtype = [img`
-    . 
-    `]
+objx = []
+objy = []
+objh = []
+objtype = []
+let objIdx: number[] = []
 let coinX: number[] = []
 let coinY: number[] = []
 let coinH: number[] = []
@@ -523,10 +529,10 @@ game.onUpdate(function () {
         ................................................................................................................................................................
         ................................................................................................................................................................
         `)
-    if (drift == "r" && Math.percentChance(100)) {
+    if (drift != "" && Math.percentChance(25)) {
         objx.push(px)
         objy.push(py)
-        objh.push(randint(4, 6))
+        objh.push(randint(1, 2))
         if (Math.percentChance(50)) {
             objtype.push(img`
                 . . 1 1 . . 
@@ -536,6 +542,7 @@ game.onUpdate(function () {
                 . d d 1 d d 
                 . . . d . . 
                 `)
+            objIdx.push(0)
         } else {
             objtype.push(img`
                 . . 1 1 1 . 
@@ -545,6 +552,23 @@ game.onUpdate(function () {
                 . d d d . . 
                 . . . . . . 
                 `)
+            objIdx.push(0)
+        }
+    }
+    for (let index = 0; index <= objx.length; index++) {
+        if (objIdx[index] == 0) {
+            if (objh[index] > 0) {
+                objh[index] = objh[index] - 0.1
+            } else {
+                objh.removeAt(index)
+                objx.removeAt(index)
+                objy.removeAt(index)
+                objtype[index] = img`
+                    . 
+                    `
+                objtype.removeAt(index)
+                objIdx.removeAt(index)
+            }
         }
     }
     for (let index = 0; index <= coinXMap.length; index++) {
@@ -579,28 +603,6 @@ game.onUpdate(function () {
         }
     }
     coinRotation += 1
-    for (let index = 0; index <= objx.length; index++) {
-        renderer.place3dImage(objtype[index], objx[index], objy[index], objh[index], 100)
-    }
-    info.setScore(objx.length)
-    renderer.place3dImage(img`
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 
-        `, 0, 0, 0, 1)
 })
 game.onUpdate(function () {
     if (mirroring) {
@@ -684,7 +686,5 @@ game.onUpdateInterval(50, function () {
 	
 })
 forever(function () {
-    for (let index = 0; index <= objx.length; index++) {
-    	
-    }
+	
 })
