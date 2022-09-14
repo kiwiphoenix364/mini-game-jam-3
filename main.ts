@@ -61,9 +61,10 @@ controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
 controller.B.onEvent(ControllerButtonEvent.Released, function () {
     drift = ""
 })
+let prevAngle = 0
+let attemptCameraOffset = 0
 let carVy = 0
 let carVx = 0
-let carPower = 0
 let fwdY = 0
 let fwdX = 0
 let coinRotation = 0
@@ -373,24 +374,24 @@ timer.background(function () {
 let coinX: number[] = []
 let coinY: number[] = []
 let coinH: number[] = []
-for (let index = 0; index <= 7; index++) {
-    coinX.push((0 - Math.cos(45 * index * Math.PI / 180)) * 8)
-    coinH.push(Math.sin(45 * index * Math.PI / 180) * 8)
+for (let index = 0; index <= 4; index++) {
+    coinX.push((0 - Math.cos((72 * index + 18) * Math.PI / 180)) * 8)
+    coinH.push(Math.sin((72 * index + 18) * Math.PI / 180) * 8)
     coinY.push(-1)
-    coinX.push((0 - Math.cos(45 * (index + 1) * Math.PI / 180)) * 8)
-    coinH.push(Math.sin(45 * (index + 1) * Math.PI / 180) * 8)
+    coinX.push((0 - Math.cos((72 * (index + 1) + 18) * Math.PI / 180)) * 8)
+    coinH.push(Math.sin((72 * (index + 1) + 18) * Math.PI / 180) * 8)
     coinY.push(-1)
-    coinX.push((0 - Math.cos(45 * index * Math.PI / 180)) * 8)
-    coinH.push(Math.sin(45 * index * Math.PI / 180) * 8)
+    coinX.push((0 - Math.cos((72 * index + 18) * Math.PI / 180)) * 8)
+    coinH.push(Math.sin((72 * index + 18) * Math.PI / 180) * 8)
     coinY.push(1)
-    coinX.push((0 - Math.cos(45 * (index + 1) * Math.PI / 180)) * 8)
-    coinH.push(Math.sin(45 * (index + 1) * Math.PI / 180) * 8)
+    coinX.push((0 - Math.cos((72 * (index + 1) + 18) * Math.PI / 180)) * 8)
+    coinH.push(Math.sin((72 * (index + 1) + 18) * Math.PI / 180) * 8)
     coinY.push(1)
-    coinX.push((0 - Math.cos(45 * index * Math.PI / 180)) * 8)
-    coinH.push(Math.sin(45 * index * Math.PI / 180) * 8)
+    coinX.push((0 - Math.cos((72 * index + 18) * Math.PI / 180)) * 8)
+    coinH.push(Math.sin((72 * index + 18) * Math.PI / 180) * 8)
     coinY.push(1)
-    coinX.push((0 - Math.cos(45 * index * Math.PI / 180)) * 8)
-    coinH.push(Math.sin(45 * index * Math.PI / 180) * 8)
+    coinX.push((0 - Math.cos((72 * index + 18) * Math.PI / 180)) * 8)
+    coinH.push(Math.sin((72 * index + 18) * Math.PI / 180) * 8)
     coinY.push(-1)
 }
 let coinXMap: number[] = []
@@ -557,50 +558,35 @@ game.onUpdate(function () {
     coinRotation += 1
 })
 game.onUpdate(function () {
-    if (drift == "l") {
-        fwdX = Math.sin((heading + -90) * Math.PI / 180)
-        fwdY = 0 - Math.cos((heading + -90) * Math.PI / 180)
-        heading += carPower * 2 * controller.dx(50)
-    } else if (drift == "r") {
-        fwdX = Math.sin((heading + 90) * Math.PI / 180)
-        fwdY = 0 - Math.cos((heading + 90) * Math.PI / 180)
-        heading += carPower * 2 * controller.dx(50)
-    } else {
-        fwdX = Math.sin(heading * Math.PI / 180)
-        fwdY = 0 - Math.cos(heading * Math.PI / 180)
-        heading += carPower * 2 * controller.dx(300)
-    }
+    let carPower = 0
     if (mirroring) {
         heading += 180
     }
-    carPower = controller.dy(-5)
     if (heading < 0) {
         heading += 360
     }
     if (heading >= 360) {
         heading += 0 - 360
     }
-    carVx += carPower * fwdX
-    carVy += carPower * fwdY
     if (drift == "l") {
-        carVx += carPower * -1 * Math.sin((heading + 270) * Math.PI / 180)
-        carVy += carPower * -1 * (0 - Math.cos((heading + 270) * Math.PI / 180))
+        heading += carPower * 2 * (controller.dx(150) - 5)
+        fwdX = Math.sin((heading + 30) * Math.PI / 180)
+        fwdY = 0 - Math.cos((heading + 30) * Math.PI / 180)
     } else if (drift == "r") {
-        carVx += (0 - carPower * 1) * Math.sin((heading + 270) * Math.PI / 180)
-        carVy += (0 - carPower * 1) * (0 - Math.cos((heading + 270) * Math.PI / 180))
+        heading += carPower * 2 * (controller.dx(150) + 5)
+        fwdX = Math.sin((heading + 330) * Math.PI / 180)
+        fwdY = 0 - Math.cos((heading + 330) * Math.PI / 180)
     } else {
-        carVx += carPower * controller.dx(0) * Math.sin((heading + 270) * Math.PI / 180)
-        carVy += carPower * controller.dx(0) * (0 - Math.cos((heading + 270) * Math.PI / 180))
+        heading += carPower * 2 * controller.dx(300)
+        fwdX = Math.sin(heading * Math.PI / 180)
+        fwdY = 0 - Math.cos(heading * Math.PI / 180)
     }
-    carVx += Math.sin(heading * Math.PI / 180) / 50 * carPower
-    carVy += (0 - Math.cos(heading * Math.PI / 180)) / 50 * carPower
-    if (drift == "l" || drift == "r") {
-        carVx += 0 - carVx / 35
-        carVy += 0 - carVy / 35
-    } else {
-        carVx += 0 - carVx / 55
-        carVy += 0 - carVy / 55
-    }
+    carVx += carPower * 2 * fwdX
+    carVy += carPower * 2 * fwdY
+    carVx += Math.sin(heading * Math.PI / 180) / 80 * carPower
+    carVy += (0 - Math.cos(heading * Math.PI / 180)) / 80 * carPower
+    carVx += 0 - carVx / 20
+    carVy += 0 - carVy / 20
     if (carVx > 0.04 && carVx < -0.04) {
     	
     }
@@ -629,6 +615,24 @@ game.onUpdate(function () {
     }
     if (heading >= 360) {
         heading += 0 - 360
+    }
+})
+game.onUpdate(function () {
+    attemptCameraOffset = (heading - prevAngle) * 8
+    prevAngle = heading
+    if (cameraOffset < 0) {
+        cameraOffset += 360
+    } else if (cameraOffset > 360) {
+        cameraOffset += -360
+    } else {
+    	
+    }
+    if (cameraOffset < attemptCameraOffset) {
+        cameraOffset += 0.1
+    } else if (cameraOffset > attemptCameraOffset) {
+        cameraOffset += -0.1
+    } else {
+    	
     }
 })
 game.onUpdateInterval(50, function () {
