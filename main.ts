@@ -67,6 +67,7 @@ let carVy = 0
 let carVx = 0
 let fwdY = 0
 let fwdX = 0
+let carPower = 0
 let coinRotation = 0
 let mirroring = false
 let drift = ""
@@ -541,8 +542,8 @@ game.onUpdate(function () {
         arrayx2.push(px + (arrayx[index * 2 + (24 + 1)] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index * 2 + (24 + 1)] * Math.sin((heading + cameraOffset) * Math.PI / 180)))
         arrayy2.push(py + (arrayy[index * 2 + 24] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index * 2 + 24] * Math.sin((heading + cameraOffset) * Math.PI / 180)))
         arrayy2.push(py + (arrayy[index * 2 + (24 + 1)] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index * 2 + (24 + 1)] * Math.sin((heading + cameraOffset) * Math.PI / 180)))
-        arrayh2.push(arrayh[index * 2 + 24])
-        arrayh2.push(arrayh[index * 2 + (24 + 1)])
+        arrayh2.push(arrayh[index * 2 + 24] - carYOffset)
+        arrayh2.push(arrayh[index * 2 + (24 + 1)] - carYOffset)
     }
     for (let index7 = 0; index7 <= arrayx2.length / 2; index7++) {
         renderer.place3dLine(9, arrayx2[index7 * 2], arrayy2[index7 * 2], arrayh2[index7 * 2], arrayx2[index7 * 2 + 1], arrayy2[index7 * 2 + 1], arrayh2[index7 * 2 + 1])
@@ -558,7 +559,6 @@ game.onUpdate(function () {
     coinRotation += 1
 })
 game.onUpdate(function () {
-    let carPower = 0
     if (mirroring) {
         heading += 180
     }
@@ -581,12 +581,13 @@ game.onUpdate(function () {
         fwdX = Math.sin(heading * Math.PI / 180)
         fwdY = 0 - Math.cos(heading * Math.PI / 180)
     }
+    carPower = controller.dy(-5)
     carVx += carPower * 2 * fwdX
     carVy += carPower * 2 * fwdY
     carVx += Math.sin(heading * Math.PI / 180) / 80 * carPower
     carVy += (0 - Math.cos(heading * Math.PI / 180)) / 80 * carPower
-    carVx += 0 - carVx / 20
-    carVy += 0 - carVy / 20
+    carVx += 0 - carVx / 15
+    carVy += 0 - carVy / 15
     if (carVx > 0.04 && carVx < -0.04) {
     	
     }
@@ -618,19 +619,19 @@ game.onUpdate(function () {
     }
 })
 game.onUpdate(function () {
-    attemptCameraOffset = (heading - prevAngle) * 8
+    attemptCameraOffset = (heading - prevAngle) * 10
     prevAngle = heading
-    if (cameraOffset < 0) {
+    if (cameraOffset < -180) {
         cameraOffset += 360
-    } else if (cameraOffset > 360) {
+    } else if (cameraOffset > 180) {
         cameraOffset += -360
     } else {
     	
     }
-    if (cameraOffset < attemptCameraOffset) {
-        cameraOffset += 0.1
-    } else if (cameraOffset > attemptCameraOffset) {
-        cameraOffset += -0.1
+    if (Math.round(cameraOffset) < Math.round(attemptCameraOffset)) {
+        cameraOffset += 1
+    } else if (Math.round(cameraOffset) > Math.round(attemptCameraOffset)) {
+        cameraOffset += -1
     } else {
     	
     }
