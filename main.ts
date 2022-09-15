@@ -361,7 +361,7 @@ let arrayh = [
 2,
 3
 ]
-heading = 180
+heading = 11
 timer.background(function () {
     for (let index = 0; index < 360; index++) {
         pause(1)
@@ -399,13 +399,42 @@ for (let index = 0; index <= 4; index++) {
 }
 let coinXMap: number[] = []
 let coinYMap: number[] = []
+setUpTrack2()
+initializeTrack()
+tileUtil.unloadTilemap()
+tiles.setCurrentTilemap(tilemap`level5`)
+let CPUPX: number[] = []
+let CPUPY: number[] = []
+for (let value of tiles.getTilesByType(assets.tile`myTile3`)) {
+    for (let index = 0; index <= 7; index++) {
+        if (index < 4) {
+            CPUPX.push(value.x + 32 - index * 16)
+            CPUPY.push(value.y - 16 - index * 8)
+        } else if (index < 7) {
+            CPUPX.push(value.x + 96 - index * 16)
+            CPUPY.push(value.y - 16 - index * 8)
+        } else {
+            px = value.x + 96 - index * 16
+            py = value.y - 16 - index * 8
+        }
+        objx.push(CPUPX[index])
+        objy.push(CPUPY[index])
+        objh.push(1)
+        objtype.push(img`
+            . . 1 1 . . 
+            . 1 1 1 . . 
+            1 1 1 1 1 . 
+            d 1 1 1 1 1 
+            . d d 1 d d 
+            . . . d . . 
+            `)
+        objIdx.push(2)
+    }
+}
 for (let value of tiles.getTilesByType(assets.tile`myTile`)) {
     coinXMap.push(value.x + 0)
     coinYMap.push(value.y + 0)
 }
-setUpTrack2()
-initializeTrack()
-tileUtil.unloadTilemap()
 game.onUpdate(function () {
     mySprite.setImage(img`
         ................................................................................................................................................................
@@ -532,7 +561,7 @@ game.onUpdate(function () {
     if (drift != "" && Math.percentChance(25)) {
         objx.push(px)
         objy.push(py)
-        objh.push(randint(1, 2))
+        objh.push(1)
         if (Math.percentChance(50)) {
             objtype.push(img`
                 . . 1 1 . . 
@@ -573,7 +602,7 @@ game.onUpdate(function () {
     }
     for (let index = 0; index <= coinXMap.length; index++) {
         for (let index7 = 0; index7 <= coinX.length / 2; index7++) {
-            renderer.place3dLine(7, coinXMap[index] + (coinX[index7 * 2] * Math.cos(coinRotation * Math.PI / 180) - coinY[index7 * 2] * Math.sin(coinRotation * Math.PI / 180)), coinYMap[index] + (coinY[index7 * 2] * Math.cos(coinRotation * Math.PI / 180) + coinX[index7 * 2] * Math.sin(coinRotation * Math.PI / 180)), coinH[index7 * 2], coinXMap[index] + (coinX[index7 * 2 + 1] * Math.cos(coinRotation * Math.PI / 180) - coinY[index7 * 2 + 1] * Math.sin(coinRotation * Math.PI / 180)), coinYMap[index] + (coinY[index7 * 2 + 1] * Math.cos(coinRotation * Math.PI / 180) + coinX[index7 * 2 + 1] * Math.sin(coinRotation * Math.PI / 180)), coinH[index7 * 2 + 1])
+            renderer.place3dLine(7, coinXMap[index] + (coinX[index7 * 2] * Math.cos(coinRotation * Math.PI / 180) - coinY[index7 * 2] * Math.sin(coinRotation * Math.PI / 180)), coinYMap[index] + (coinY[index7 * 2] * Math.cos(coinRotation * Math.PI / 180) + coinX[index7 * 2] * Math.sin(coinRotation * Math.PI / 180)), coinH[index7 * 2] + 10, coinXMap[index] + (coinX[index7 * 2 + 1] * Math.cos(coinRotation * Math.PI / 180) - coinY[index7 * 2 + 1] * Math.sin(coinRotation * Math.PI / 180)), coinYMap[index] + (coinY[index7 * 2 + 1] * Math.cos(coinRotation * Math.PI / 180) + coinX[index7 * 2 + 1] * Math.sin(coinRotation * Math.PI / 180)), coinH[index7 * 2 + 1] + 10)
         }
     }
     for (let index7 = 0; index7 <= arrayx.length / 2; index7++) {
