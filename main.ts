@@ -700,11 +700,7 @@ game.onUpdate(function () {
         }
         for (let index = 0; index <= coinXMap.length; index++) {
             for (let index7 = 0; index7 <= coinX.length / 2; index7++) {
-                if (Math.percentChance(Math.sqrt((coinXMap[index] - px) * (coinXMap[index] - px) + (coinYMap[index] - py) * (coinYMap[index] - py)) / 4)) {
-                	
-                } else {
-                    renderer.place3dLine(7, coinXMap[index] + (coinX[index7 * 2] * Math.cos(coinRotation * Math.PI / 180) - coinY[index7 * 2] * Math.sin(coinRotation * Math.PI / 180)), coinYMap[index] + (coinY[index7 * 2] * Math.cos(coinRotation * Math.PI / 180) + coinX[index7 * 2] * Math.sin(coinRotation * Math.PI / 180)), coinH[index7 * 2] + 10, coinXMap[index] + (coinX[index7 * 2 + 1] * Math.cos(coinRotation * Math.PI / 180) - coinY[index7 * 2 + 1] * Math.sin(coinRotation * Math.PI / 180)), coinYMap[index] + (coinY[index7 * 2 + 1] * Math.cos(coinRotation * Math.PI / 180) + coinX[index7 * 2 + 1] * Math.sin(coinRotation * Math.PI / 180)), coinH[index7 * 2 + 1] + 10)
-                }
+            	
             }
         }
         for (let index7 = 0; index7 <= arrayx.length / 2; index7++) {
@@ -756,6 +752,7 @@ game.onUpdate(function () {
 game.onUpdate(function () {
     if (mirroring) {
         heading += 180
+        cameraOffset += 180
     }
     if (heading < 0) {
         heading += 360
@@ -803,17 +800,6 @@ game.onUpdate(function () {
     if (py < 0) {
         py = 0
     }
-    if (mirroring) {
-        heading += -180
-    }
-    if (heading < 0) {
-        heading += 360
-    }
-    if (heading >= 360) {
-        heading += 0 - 360
-    }
-})
-game.onUpdate(function () {
     attemptCameraOffset = (heading - prevAngle) * 10
     prevAngle = heading
     if (cameraOffset < -180) {
@@ -830,6 +816,19 @@ game.onUpdate(function () {
     } else {
     	
     }
+    if (mirroring) {
+        heading += -180
+        cameraOffset += -180
+    }
+    if (heading < 0) {
+        heading += 360
+    }
+    if (heading >= 360) {
+        heading += 0 - 360
+    }
+})
+game.onUpdate(function () {
+	
 })
 game.onUpdateInterval(50, function () {
 	
