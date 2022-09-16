@@ -9,7 +9,7 @@ function drawSprites () {
     for (let i = 0; i <= treeX.length; i++) {
     	
     }
-    for (let index = 0; index <= objx.length - 1; index++) {
+    for (let index = 0; index <= objtype.length - 1; index++) {
         renderer.place3dImage(objtype[index], objx[index], objy[index], objh[index], objtype[index].width)
     }
 }
@@ -236,8 +236,6 @@ let zNear = 30
 let zFar = 300
 // Color used for drawing ground outside the track texture.
 let outsideTrackColor = 8
-renderer.setUp(drawSprites)
-renderer.placePlayerSprite(carSprite, 12, 17)
 let carDragForward = 0.03
 let carDragSideways = 0.15
 let carDragSidewaysDrift = 0.04
@@ -405,6 +403,15 @@ tileUtil.unloadTilemap()
 tiles.setCurrentTilemap(tilemap`level5`)
 let CPUPX: number[] = []
 let CPUPY: number[] = []
+let CPUANGLE = [
+0,
+0,
+0,
+0,
+0,
+0,
+0
+]
 for (let value of tiles.getTilesByType(assets.tile`myTile3`)) {
     for (let index = 0; index <= 7; index++) {
         if (index < 4) {
@@ -417,24 +424,14 @@ for (let value of tiles.getTilesByType(assets.tile`myTile3`)) {
             px = value.x + 96 - index * 16
             py = value.y - 16 - index * 8
         }
-        objx.push(CPUPX[index])
-        objy.push(CPUPY[index])
-        objh.push(1)
-        objtype.push(img`
-            . . 1 1 . . 
-            . 1 1 1 . . 
-            1 1 1 1 1 . 
-            d 1 1 1 1 1 
-            . d d 1 d d 
-            . . . d . . 
-            `)
-        objIdx.push(2)
     }
 }
 for (let value of tiles.getTilesByType(assets.tile`myTile`)) {
     coinXMap.push(value.x + 0)
     coinYMap.push(value.y + 0)
 }
+renderer.setUp(drawSprites)
+renderer.placePlayerSprite(carSprite, 12, 17)
 game.onUpdate(function () {
     mySprite.setImage(img`
         ................................................................................................................................................................
@@ -600,6 +597,11 @@ game.onUpdate(function () {
             }
         }
     }
+    for (let index = 0; index <= 7; index++) {
+        CPUANGLE[index] = 0
+        CPUPX[index] = CPUPX[index] + Math.sin(CPUANGLE[index] * Math.PI / 180)
+        CPUPY[index] = CPUPY[index] + (0 - Math.cos(CPUANGLE[index] * Math.PI / 180))
+    }
     for (let index = 0; index <= coinXMap.length; index++) {
         for (let index7 = 0; index7 <= coinX.length / 2; index7++) {
             renderer.place3dLine(7, coinXMap[index] + (coinX[index7 * 2] * Math.cos(coinRotation * Math.PI / 180) - coinY[index7 * 2] * Math.sin(coinRotation * Math.PI / 180)), coinYMap[index] + (coinY[index7 * 2] * Math.cos(coinRotation * Math.PI / 180) + coinX[index7 * 2] * Math.sin(coinRotation * Math.PI / 180)), coinH[index7 * 2] + 10, coinXMap[index] + (coinX[index7 * 2 + 1] * Math.cos(coinRotation * Math.PI / 180) - coinY[index7 * 2 + 1] * Math.sin(coinRotation * Math.PI / 180)), coinYMap[index] + (coinY[index7 * 2 + 1] * Math.cos(coinRotation * Math.PI / 180) + coinX[index7 * 2 + 1] * Math.sin(coinRotation * Math.PI / 180)), coinH[index7 * 2 + 1] + 10)
@@ -610,6 +612,15 @@ game.onUpdate(function () {
             renderer.place3dLine(1, px + (arrayx[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2] - carYOffset, px + (arrayx[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2 + 1] - carYOffset)
         } else {
             renderer.place3dLine(9, px + (arrayx[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2] - carYOffset, px + (arrayx[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), py + (arrayy[index7 * 2 + 1] * Math.cos((heading + cameraOffset) * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin((heading + cameraOffset) * Math.PI / 180)), arrayh[index7 * 2 + 1] - carYOffset)
+        }
+    }
+    for (let index = 0; index <= CPUPX.length; index++) {
+        for (let index7 = 0; index7 <= arrayx.length / 2; index7++) {
+            if (index7 < 12) {
+                renderer.place3dLine(1, CPUPX[index] + (arrayx[index7 * 2] * Math.cos(CPUANGLE[index] * Math.PI / 180) - arrayy[index7 * 2] * Math.sin(CPUANGLE[index] * Math.PI / 180)), CPUPY[index] + (arrayy[index7 * 2] * Math.cos(CPUANGLE[index] * Math.PI / 180) + arrayx[index7 * 2] * Math.sin(CPUANGLE[index] * Math.PI / 180)), arrayh[index7 * 2] - carYOffset, CPUPX[index] + (arrayx[index7 * 2 + 1] * Math.cos(CPUANGLE[index] * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin(CPUANGLE[index] * Math.PI / 180)), CPUPY[index] + (arrayy[index7 * 2 + 1] * Math.cos(CPUANGLE[index] * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin(CPUANGLE[index] * Math.PI / 180)), arrayh[index7 * 2 + 1])
+            } else {
+                renderer.place3dLine(9, CPUPX[index] + (arrayx[index7 * 2] * Math.cos(CPUANGLE[index] * Math.PI / 180) - arrayy[index7 * 2] * Math.sin(CPUANGLE[index] * Math.PI / 180)), CPUPY[index] + (arrayy[index7 * 2] * Math.cos(CPUANGLE[index] * Math.PI / 180) + arrayx[index7 * 2] * Math.sin(CPUANGLE[index] * Math.PI / 180)), arrayh[index7 * 2] - carYOffset, CPUPX[index] + (arrayx[index7 * 2 + 1] * Math.cos(CPUANGLE[index] * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin(CPUANGLE[index] * Math.PI / 180)), CPUPY[index] + (arrayy[index7 * 2 + 1] * Math.cos(CPUANGLE[index] * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin(CPUANGLE[index] * Math.PI / 180)), arrayh[index7 * 2 + 1])
+            }
         }
     }
     for (let index = 0; index <= 5; index++) {
