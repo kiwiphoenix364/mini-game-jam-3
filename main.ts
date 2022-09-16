@@ -364,10 +364,10 @@ let arrayh = [
 ]
 heading = 11
 timer.background(function () {
-    for (let index = 0; index < 360; index++) {
+    for (let index = 0; index < 90; index++) {
         pause(1)
-        cameraOffset += -1
-        heading += 1
+        cameraOffset += 4
+        heading += 4
     }
 })
 objx = []
@@ -406,7 +406,7 @@ tileUtil.unloadTilemap()
 tiles.setCurrentTilemap(tilemap`level5`)
 let CPUPX: number[] = []
 let CPUPY: number[] = []
-let CPUANGLE = [
+let CPUAngle = [
 0,
 0,
 0,
@@ -416,6 +416,15 @@ let CPUANGLE = [
 0
 ]
 let CPUpos = [
+0,
+0,
+0,
+0,
+0,
+0,
+0
+]
+let CPUSpeed = [
 0,
 0,
 0,
@@ -645,9 +654,10 @@ game.onUpdate(function () {
                 }
             }
         }
-        CPUANGLE[index] = Math.atan2(tempY - CPUPY[index], tempX - CPUPX[index]) * (180 / Math.PI)
-        CPUPX[index] = CPUPX[index] + Math.sin(CPUANGLE[index] * Math.PI / 180)
-        CPUPY[index] = CPUPY[index] + (0 - Math.cos(CPUANGLE[index] * Math.PI / 180))
+        CPUAngle[index] = spriteutils.radiansToDegrees(Math.atan2((tempY - CPUPY[index]) / Math.max(Math.abs(tempY - CPUPY[index]), Math.abs(tempX - CPUPX[index])), (tempX - CPUPX[index]) / Math.max(Math.abs(tempY - CPUPY[index]), Math.abs(tempX - CPUPX[index])))) + 90
+        CPUSpeed[index] = 2
+        CPUPX[index] = CPUPX[index] + (tempX - CPUPX[index]) / Math.max(Math.abs(tempY - CPUPY[index]), Math.abs(tempX - CPUPX[index])) * CPUSpeed[index]
+        CPUPY[index] = CPUPY[index] + (tempY - CPUPY[index]) / Math.max(Math.abs(tempY - CPUPY[index]), Math.abs(tempX - CPUPX[index])) * CPUSpeed[index]
     }
     for (let index = 0; index <= coinXMap.length; index++) {
         for (let index7 = 0; index7 <= coinX.length / 2; index7++) {
@@ -664,9 +674,9 @@ game.onUpdate(function () {
     for (let index = 0; index <= CPUPX.length; index++) {
         for (let index7 = 0; index7 <= arrayx.length / 2; index7++) {
             if (index7 < 12) {
-                renderer.place3dLine(1, CPUPX[index] + (arrayx[index7 * 2] * Math.cos(CPUANGLE[index] * Math.PI / 180) - arrayy[index7 * 2] * Math.sin(CPUANGLE[index] * Math.PI / 180)), CPUPY[index] + (arrayy[index7 * 2] * Math.cos(CPUANGLE[index] * Math.PI / 180) + arrayx[index7 * 2] * Math.sin(CPUANGLE[index] * Math.PI / 180)), arrayh[index7 * 2] - carYOffset, CPUPX[index] + (arrayx[index7 * 2 + 1] * Math.cos(CPUANGLE[index] * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin(CPUANGLE[index] * Math.PI / 180)), CPUPY[index] + (arrayy[index7 * 2 + 1] * Math.cos(CPUANGLE[index] * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin(CPUANGLE[index] * Math.PI / 180)), arrayh[index7 * 2 + 1])
+                renderer.place3dLine(1, CPUPX[index] + (arrayx[index7 * 2] * Math.cos(CPUAngle[index] * Math.PI / 180) - arrayy[index7 * 2] * Math.sin(CPUAngle[index] * Math.PI / 180)), CPUPY[index] + (arrayy[index7 * 2] * Math.cos(CPUAngle[index] * Math.PI / 180) + arrayx[index7 * 2] * Math.sin(CPUAngle[index] * Math.PI / 180)), arrayh[index7 * 2] - carYOffset, CPUPX[index] + (arrayx[index7 * 2 + 1] * Math.cos(CPUAngle[index] * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin(CPUAngle[index] * Math.PI / 180)), CPUPY[index] + (arrayy[index7 * 2 + 1] * Math.cos(CPUAngle[index] * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin(CPUAngle[index] * Math.PI / 180)), arrayh[index7 * 2 + 1])
             } else {
-                renderer.place3dLine(9, CPUPX[index] + (arrayx[index7 * 2] * Math.cos(CPUANGLE[index] * Math.PI / 180) - arrayy[index7 * 2] * Math.sin(CPUANGLE[index] * Math.PI / 180)), CPUPY[index] + (arrayy[index7 * 2] * Math.cos(CPUANGLE[index] * Math.PI / 180) + arrayx[index7 * 2] * Math.sin(CPUANGLE[index] * Math.PI / 180)), arrayh[index7 * 2] - carYOffset, CPUPX[index] + (arrayx[index7 * 2 + 1] * Math.cos(CPUANGLE[index] * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin(CPUANGLE[index] * Math.PI / 180)), CPUPY[index] + (arrayy[index7 * 2 + 1] * Math.cos(CPUANGLE[index] * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin(CPUANGLE[index] * Math.PI / 180)), arrayh[index7 * 2 + 1])
+                renderer.place3dLine(9, CPUPX[index] + (arrayx[index7 * 2] * Math.cos(CPUAngle[index] * Math.PI / 180) - arrayy[index7 * 2] * Math.sin(CPUAngle[index] * Math.PI / 180)), CPUPY[index] + (arrayy[index7 * 2] * Math.cos(CPUAngle[index] * Math.PI / 180) + arrayx[index7 * 2] * Math.sin(CPUAngle[index] * Math.PI / 180)), arrayh[index7 * 2] - carYOffset, CPUPX[index] + (arrayx[index7 * 2 + 1] * Math.cos(CPUAngle[index] * Math.PI / 180) - arrayy[index7 * 2 + 1] * Math.sin(CPUAngle[index] * Math.PI / 180)), CPUPY[index] + (arrayy[index7 * 2 + 1] * Math.cos(CPUAngle[index] * Math.PI / 180) + arrayx[index7 * 2 + 1] * Math.sin(CPUAngle[index] * Math.PI / 180)), arrayh[index7 * 2 + 1])
             }
         }
     }
