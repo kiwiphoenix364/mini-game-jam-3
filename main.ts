@@ -1,6 +1,8 @@
-function setUpTrack2 () {
-	
-}
+controller.player2.onButtonEvent(ControllerButton.Down, ControllerButtonEvent.Released, function () {
+    cameraOffset += 180
+    heading += 180
+    mirroring = false
+})
 function drawSprites () {
     // renderer.place3dImage(ballImage, 10, 73, 0, 1)
     // renderer.place3dImage(ballImage, 11, 72, 0, 1)
@@ -24,6 +26,14 @@ function initializeTrack () {
         }
     }
 }
+function configure () {
+    renderer.setBackgroundImage(assets.image`background`)
+renderer.setZClipFar(zFar)
+controller.player1.analog = true
+}
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    Start_LVL(1)
+})
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     timer.background(function () {
         for (let index = 0; index < 20; index++) {
@@ -41,23 +51,294 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
         }
     })
 })
-function configure () {
-    renderer.setBackgroundImage(assets.image`background`)
-renderer.setZClipFar(zFar)
-controller.player1.analog = true
+controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
+    stats.turnStats(true)
+})
+function Start_LVL (LVL_NUM: number) {
+    tiles.setCurrentTilemap(tilemap`level1`)
+    trackImage = image.create(4080, 4080)
+    redrawImg.GenerateImage()
+    configure()
+    arrayx2 = []
+    arrayy2 = []
+    arrayh2 = []
+    carAngularVelocity = 0
+    throttle = 0
+    let py = 0
+let px = 0
+pxPrev = px
+    pyPrev = py
+    // How far behind the player should the camera be placed?
+    followDistance = 40
+    // Horizontal field of view in degrees. See backgroundImage comments,
+    // it should be matched to the background image width.
+    fov = 90
+    // Y position of the horizon. Must match the backgroundImage (half) height.
+    horizonY = 30
+    // Z near and far (horizon) view distances
+    zNear = 30
+    zFar = 300
+    // Color used for drawing ground outside the track texture.
+    outsideTrackColor = 8
+    carDragForward = 0.03
+    carDragSideways = 0.15
+    carDragSidewaysDrift = 0.04
+    carDragOffroad = 0.2
+    carAngularDrag = 0.85
+    carAngularDragDrift = 0.95
+    hOffset = -18
+    hJumpSpeed = -20
+    hAccel = 0.2
+    arrayx = [
+    -4,
+    4,
+    -4,
+    -4,
+    4,
+    4,
+    -4,
+    4,
+    4,
+    3,
+    -4,
+    -3,
+    4,
+    3,
+    -4,
+    -3,
+    -3,
+    -3,
+    3,
+    3,
+    3,
+    -3,
+    3,
+    -3,
+    -2,
+    -3,
+    -3,
+    -1,
+    -1,
+    -2,
+    2,
+    3,
+    3,
+    1,
+    1,
+    2
+    ]
+    arrayy = [
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    -4,
+    4,
+    -4,
+    4,
+    -4,
+    4,
+    -4,
+    -4,
+    -4,
+    -4,
+    -4,
+    -4,
+    -4,
+    -4,
+    -4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4
+    ]
+    arrayh = [
+    0,
+    0,
+    0,
+    4,
+    0,
+    4,
+    4,
+    4,
+    0,
+    0,
+    0,
+    0,
+    4,
+    3,
+    4,
+    3,
+    0,
+    3,
+    0,
+    3,
+    0,
+    0,
+    3,
+    3,
+    3,
+    2,
+    2,
+    2,
+    2,
+    3,
+    3,
+    2,
+    2,
+    2,
+    2,
+    3
+    ]
+    heading = 180
+    objx = []
+    objy = []
+    objh = []
+    objtype = []
+    objIdx = []
+    coinX = []
+    coinY = []
+    coinH = []
+    for (let index = 0; index <= 4; index++) {
+        coinX.push((0 - Math.cos((72 * index + 18) * Math.PI / 180)) * 8)
+        coinH.push(Math.sin((72 * index + 18) * Math.PI / 180) * 8)
+        coinY.push(-1)
+        coinX.push((0 - Math.cos((72 * (index + 1) + 18) * Math.PI / 180)) * 8)
+        coinH.push(Math.sin((72 * (index + 1) + 18) * Math.PI / 180) * 8)
+        coinY.push(-1)
+        coinX.push((0 - Math.cos((72 * index + 18) * Math.PI / 180)) * 8)
+        coinH.push(Math.sin((72 * index + 18) * Math.PI / 180) * 8)
+        coinY.push(1)
+        coinX.push((0 - Math.cos((72 * (index + 1) + 18) * Math.PI / 180)) * 8)
+        coinH.push(Math.sin((72 * (index + 1) + 18) * Math.PI / 180) * 8)
+        coinY.push(1)
+        coinX.push((0 - Math.cos((72 * index + 18) * Math.PI / 180)) * 8)
+        coinH.push(Math.sin((72 * index + 18) * Math.PI / 180) * 8)
+        coinY.push(1)
+        coinX.push((0 - Math.cos((72 * index + 18) * Math.PI / 180)) * 8)
+        coinH.push(Math.sin((72 * index + 18) * Math.PI / 180) * 8)
+        coinY.push(-1)
+    }
+    coinXMap = []
+    coinYMap = []
+    initializeTrack()
+    tileUtil.unloadTilemap()
+    tiles.setCurrentTilemap(tilemap`level5`)
+    CPUPX = []
+    CPUPY = []
+    CPUAngle = [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+    ]
+    CPUpos = [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+    ]
+    CPUSpeed = [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+    ]
+    CPUSpeed = [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+    ]
+    CPUTempX = [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+    ]
+    CPUTempY = [
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0
+    ]
+    for (let value of tiles.getTilesByType(assets.tile`myTile3`)) {
+        for (let index = 0; index <= 7; index++) {
+            if (index < 4) {
+                CPUPX.push(value.x + 32 - index * 16)
+                CPUPY.push(value.y - 16 - index * 8)
+            } else if (index < 7) {
+                CPUPX.push(value.x + 96 - index * 16)
+                CPUPY.push(value.y - 16 - index * 8)
+            } else {
+                px = value.x + 96 - index * 16
+                py = value.y - 16 - index * 8
+                pxPrev = value.x + 96 - index * 16
+                pyPrev = value.y - 16 - index * 8
+            }
+        }
+    }
+    for (let value of tiles.getTilesByType(assets.tile`myTile`)) {
+        coinXMap.push(value.x + 0)
+        coinYMap.push(value.y + 0)
+    }
+    for (let index = 0; index <= 7; index++) {
+        dis = 99999
+        for (let value of tiles.getTilesByType(assets.tile`myTile1`)) {
+            if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
+                dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
+                CPUTempX[index] = value.x
+                CPUTempY[index] = value.y
+            }
+        }
+        CPUpos[index] = 1
+    }
+    raceStarted = false
+    for (let index = 0; index < 90; index++) {
+        pause(1)
+        cameraOffset += 4
+        heading += 4
+    }
+    pause(1000)
+    raceStarted = true
+    renderer.setUp(drawSprites)
+renderer.placePlayerSprite(carSprite, 12, 17)
 }
 controller.player2.onButtonEvent(ControllerButton.Down, ControllerButtonEvent.Pressed, function () {
     cameraOffset += 180
     heading += 180
     mirroring = true
-})
-controller.player2.onButtonEvent(ControllerButton.Down, ControllerButtonEvent.Released, function () {
-    cameraOffset += 180
-    heading += 180
-    mirroring = false
-})
-controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
-    stats.turnStats(true)
 })
 controller.B.onEvent(ControllerButtonEvent.Released, function () {
     drift = ""
@@ -71,27 +352,67 @@ let fwdX = 0
 let carPower = 0
 let coinRotation = 0
 let Max = 0
-let mirroring = false
 let drift = ""
 let carYOffset = 0
 let treeY: number[] = []
 let treeX: number[] = []
+let mirroring = false
 let cameraOffset = 0
+let raceStarted = false
 let dis = 0
+let CPUTempY: number[] = []
+let CPUTempX: number[] = []
+let CPUSpeed: number[] = []
+let CPUpos: number[] = []
+let CPUAngle: number[] = []
+let CPUPY: number[] = []
+let CPUPX: number[] = []
+let coinYMap: number[] = []
+let coinXMap: number[] = []
+let coinH: number[] = []
+let coinY: number[] = []
+let coinX: number[] = []
+let objIdx: number[] = []
 let objtype: Image[] = []
 let objh: number[] = []
 let objy: number[] = []
 let objx: number[] = []
+let heading = 0
+let arrayh: number[] = []
+let arrayy: number[] = []
+let arrayx: number[] = []
+let hAccel = 0
+let hJumpSpeed = 0
+let hOffset = 0
+let carAngularDragDrift = 0
+let carAngularDrag = 0
+let carDragOffroad = 0
+let carDragSidewaysDrift = 0
+let carDragSideways = 0
+let carDragForward = 0
+let outsideTrackColor = 0
+let zFar = 0
+let zNear = 0
+let horizonY = 0
+let fov = 0
+let followDistance = 0
+let pyPrev = 0
+let pxPrev = 0
+let throttle = 0
+let carAngularVelocity = 0
+let arrayh2: number[] = []
+let arrayy2: number[] = []
+let arrayx2: number[] = []
 let trackImage: Image = null
 tiles.setCurrentTilemap(tilemap`level1`)
 trackImage = image.create(4080, 4080)
 redrawImg.GenerateImage()
 configure()
-let arrayx2: number[] = []
-let arrayy2: number[] = []
-let arrayh2: number[] = []
-let carAngularVelocity = 0
-let throttle = 0
+arrayx2 = []
+arrayy2 = []
+arrayh2 = []
+carAngularVelocity = 0
+throttle = 0
 let py = 0
 let px = 0
 let mySprite = sprites.create(img`
@@ -220,30 +541,30 @@ mySprite.setFlag(SpriteFlag.RelativeToCamera, true)
 mySprite.z = 500
 let carSprite = sprites.create(assets.image`car`, SpriteKind.Player)
 carSprite.z = 200
-let pxPrev = px
-let pyPrev = py
+pxPrev = px
+pyPrev = py
 // How far behind the player should the camera be placed?
-let followDistance = 40
+followDistance = 40
 // Horizontal field of view in degrees. See backgroundImage comments,
 // it should be matched to the background image width.
-let fov = 90
+fov = 90
 // Y position of the horizon. Must match the backgroundImage (half) height.
-let horizonY = 30
+horizonY = 30
 // Z near and far (horizon) view distances
-let zNear = 30
-let zFar = 300
+zNear = 30
+zFar = 300
 // Color used for drawing ground outside the track texture.
-let outsideTrackColor = 8
-let carDragForward = 0.03
-let carDragSideways = 0.15
-let carDragSidewaysDrift = 0.04
-let carDragOffroad = 0.2
-let carAngularDrag = 0.85
-let carAngularDragDrift = 0.95
-let hOffset = -18
-let hJumpSpeed = -20
-let hAccel = 0.2
-let arrayx = [
+outsideTrackColor = 8
+carDragForward = 0.03
+carDragSideways = 0.15
+carDragSidewaysDrift = 0.04
+carDragOffroad = 0.2
+carAngularDrag = 0.85
+carAngularDragDrift = 0.95
+hOffset = -18
+hJumpSpeed = -20
+hAccel = 0.2
+arrayx = [
 -4,
 4,
 -4,
@@ -281,7 +602,7 @@ let arrayx = [
 1,
 2
 ]
-let arrayy = [
+arrayy = [
 4,
 4,
 4,
@@ -319,7 +640,7 @@ let arrayy = [
 4,
 4
 ]
-let arrayh = [
+arrayh = [
 0,
 0,
 0,
@@ -357,15 +678,15 @@ let arrayh = [
 2,
 3
 ]
-let heading = 180
+heading = 180
 objx = []
 objy = []
 objh = []
 objtype = []
-let objIdx: number[] = []
-let coinX: number[] = []
-let coinY: number[] = []
-let coinH: number[] = []
+objIdx = []
+coinX = []
+coinY = []
+coinH = []
 for (let index = 0; index <= 4; index++) {
     coinX.push((0 - Math.cos((72 * index + 18) * Math.PI / 180)) * 8)
     coinH.push(Math.sin((72 * index + 18) * Math.PI / 180) * 8)
@@ -386,15 +707,14 @@ for (let index = 0; index <= 4; index++) {
     coinH.push(Math.sin((72 * index + 18) * Math.PI / 180) * 8)
     coinY.push(-1)
 }
-let coinXMap: number[] = []
-let coinYMap: number[] = []
-setUpTrack2()
+coinXMap = []
+coinYMap = []
 initializeTrack()
 tileUtil.unloadTilemap()
 tiles.setCurrentTilemap(tilemap`level5`)
-let CPUPX: number[] = []
-let CPUPY: number[] = []
-let CPUAngle = [
+CPUPX = []
+CPUPY = []
+CPUAngle = [
 0,
 0,
 0,
@@ -403,16 +723,7 @@ let CPUAngle = [
 0,
 0
 ]
-let CPUpos = [
-0,
-0,
-0,
-0,
-0,
-0,
-0
-]
-let CPUSpeed = [
+CPUpos = [
 0,
 0,
 0,
@@ -430,7 +741,7 @@ CPUSpeed = [
 0,
 0
 ]
-let CPUTempX = [
+CPUSpeed = [
 0,
 0,
 0,
@@ -439,7 +750,16 @@ let CPUTempX = [
 0,
 0
 ]
-let CPUTempY = [
+CPUTempX = [
+0,
+0,
+0,
+0,
+0,
+0,
+0
+]
+CPUTempY = [
 0,
 0,
 0,
@@ -479,15 +799,16 @@ for (let index = 0; index <= 7; index++) {
     }
     CPUpos[index] = 1
 }
-renderer.setUp(drawSprites)
-renderer.placePlayerSprite(carSprite, 12, 17)
+raceStarted = false
 for (let index = 0; index < 90; index++) {
     pause(1)
     cameraOffset += 4
     heading += 4
 }
 pause(1000)
-let raceStarted = true
+raceStarted = true
+renderer.setUp(drawSprites)
+renderer.placePlayerSprite(carSprite, 12, 17)
 game.onUpdate(function () {
     if (raceStarted) {
         mySprite.setImage(img`
@@ -750,96 +1071,82 @@ game.onUpdate(function () {
     }
 })
 game.onUpdate(function () {
-    if (mirroring) {
-        heading += 180
-        cameraOffset += 180
-    }
-    if (heading < 0) {
-        heading += 360
-    }
-    if (heading >= 360) {
-        heading += 0 - 360
-    }
-    if (drift == "l") {
-        heading += carPower * 2 * (controller.dx(150) - 5)
-        fwdX = Math.sin((heading + 30) * Math.PI / 180)
-        fwdY = 0 - Math.cos((heading + 30) * Math.PI / 180)
-    } else if (drift == "r") {
-        heading += carPower * 2 * (controller.dx(150) + 5)
-        fwdX = Math.sin((heading + 330) * Math.PI / 180)
-        fwdY = 0 - Math.cos((heading + 330) * Math.PI / 180)
-    } else {
-        heading += carPower * 2 * controller.dx(300)
-        fwdX = Math.sin(heading * Math.PI / 180)
-        fwdY = 0 - Math.cos(heading * Math.PI / 180)
-    }
-    carPower = controller.dy(-5)
-    carVx += carPower * 2 * fwdX
-    carVy += carPower * 2 * fwdY
-    carVx += Math.sin(heading * Math.PI / 180) / 80 * carPower
-    carVy += (0 - Math.cos(heading * Math.PI / 180)) / 80 * carPower
-    carVx += 0 - carVx / 15
-    carVy += 0 - carVy / 15
-    if (carVx > 0.04 && carVx < -0.04) {
-    	
-    }
-    if (carVy > 0.04 && carVy < -0.04) {
-    	
-    }
-    px += carVx
-    py += carVy
-    if (carVx > -0.04 && carVx < 0.04) {
-        carVx = 0
-    }
-    if (carVy > -0.04 && carVy < 0.04) {
-        carVy = 0
-    }
-    if (px < 0) {
-        px = 0
-    }
-    if (py < 0) {
-        py = 0
-    }
-    attemptCameraOffset = (heading - prevAngle) * 10
-    prevAngle = heading
-    if (cameraOffset < -180) {
-        cameraOffset += 360
-    } else if (cameraOffset > 180) {
-        cameraOffset += -360
-    } else {
-    	
-    }
-    if (Math.round(cameraOffset) < Math.round(attemptCameraOffset)) {
-        cameraOffset += 1
-    } else if (Math.round(cameraOffset) > Math.round(attemptCameraOffset)) {
-        cameraOffset += -1
-    } else {
-    	
-    }
-    if (mirroring) {
-        heading += -180
-        cameraOffset += -180
-    }
-    if (heading < 0) {
-        heading += 360
-    }
-    if (heading >= 360) {
-        heading += 0 - 360
-    }
-})
-game.onUpdate(function () {
-	
-})
-game.onUpdateInterval(50, function () {
-	
-})
-game.onUpdateInterval(700, function () {
-    timer.background(function () {
-        for (let index = 0; index <= 7; index++) {
+    if (raceStarted) {
+        if (mirroring) {
+            heading += 180
+            cameraOffset += 180
+        }
+        if (heading < 0) {
+            heading += 360
+        }
+        if (heading >= 360) {
+            heading += 0 - 360
+        }
+        if (drift == "l") {
+            heading += carPower * 2 * (controller.dx(150) - 5)
+            fwdX = Math.sin((heading + 30) * Math.PI / 180)
+            fwdY = 0 - Math.cos((heading + 30) * Math.PI / 180)
+        } else if (drift == "r") {
+            heading += carPower * 2 * (controller.dx(150) + 5)
+            fwdX = Math.sin((heading + 330) * Math.PI / 180)
+            fwdY = 0 - Math.cos((heading + 330) * Math.PI / 180)
+        } else {
+            heading += carPower * 2 * controller.dx(300)
+            fwdX = Math.sin(heading * Math.PI / 180)
+            fwdY = 0 - Math.cos(heading * Math.PI / 180)
+        }
+        carPower = controller.dy(-5)
+        carVx += carPower * 2 * fwdX
+        carVy += carPower * 2 * fwdY
+        carVx += Math.sin(heading * Math.PI / 180) / 80 * carPower
+        carVy += (0 - Math.cos(heading * Math.PI / 180)) / 80 * carPower
+        carVx += 0 - carVx / 15
+        carVy += 0 - carVy / 15
+        if (carVx > 0.04 && carVx < -0.04) {
         	
         }
-    })
-})
-forever(function () {
-	
+        if (carVy > 0.04 && carVy < -0.04) {
+        	
+        }
+        px += carVx
+        py += carVy
+        if (carVx > -0.04 && carVx < 0.04) {
+            carVx = 0
+        }
+        if (carVy > -0.04 && carVy < 0.04) {
+            carVy = 0
+        }
+        if (px < 0) {
+            px = 0
+        }
+        if (py < 0) {
+            py = 0
+        }
+        attemptCameraOffset = (heading - prevAngle) * 10
+        prevAngle = heading
+        if (cameraOffset < -180) {
+            cameraOffset += 360
+        } else if (cameraOffset > 180) {
+            cameraOffset += -360
+        } else {
+        	
+        }
+        if (Math.round(cameraOffset) < Math.round(attemptCameraOffset)) {
+            cameraOffset += 1
+        } else if (Math.round(cameraOffset) > Math.round(attemptCameraOffset)) {
+            cameraOffset += -1
+        } else {
+        	
+        }
+        if (mirroring) {
+            heading += -180
+            cameraOffset += -180
+        }
+        if (heading < 0) {
+            heading += 360
+        }
+        if (heading >= 360) {
+            heading += 0 - 360
+        }
+    }
 })
