@@ -72,6 +72,9 @@ let fwdY = 0
 let fwdX = 0
 let carPower = 0
 let coinRotation = 0
+let tempY = 0
+let tempX = 0
+let dis = 0
 let mirroring = false
 let drift = ""
 let carYOffset = 0
@@ -614,10 +617,35 @@ game.onUpdate(function () {
         } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile2`)) {
             CPUpos[index] = 0
         }
-        if (0 == 0) {
-        	
+        if (CPUpos[index] == 0) {
+            dis = 99999
+            for (let value of tiles.getTilesByType(assets.tile`myTile0`)) {
+                if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
+                    dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
+                    tempX = value.x
+                    tempY = value.y
+                }
+            }
+        } else if (CPUpos[index] == 1) {
+            dis = 99999
+            for (let value of tiles.getTilesByType(assets.tile`myTile1`)) {
+                if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
+                    dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
+                    tempX = value.x
+                    tempY = value.y
+                }
+            }
+        } else if (CPUpos[index] == 2) {
+            dis = 99999
+            for (let value of tiles.getTilesByType(assets.tile`myTile2`)) {
+                if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
+                    dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
+                    tempX = value.x
+                    tempY = value.y
+                }
+            }
         }
-        CPUANGLE[index] = heading
+        CPUANGLE[index] = Math.atan2(tempY - CPUPY[index], tempX - CPUPX[index]) * (180 / Math.PI)
         CPUPX[index] = CPUPX[index] + Math.sin(CPUANGLE[index] * Math.PI / 180)
         CPUPY[index] = CPUPY[index] + (0 - Math.cos(CPUANGLE[index] * Math.PI / 180))
     }
