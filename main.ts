@@ -412,6 +412,15 @@ let CPUANGLE = [
 0,
 0
 ]
+let CPUpos = [
+0,
+0,
+0,
+0,
+0,
+0,
+0
+]
 for (let value of tiles.getTilesByType(assets.tile`myTile3`)) {
     for (let index = 0; index <= 7; index++) {
         if (index < 4) {
@@ -598,7 +607,17 @@ game.onUpdate(function () {
         }
     }
     for (let index = 0; index <= 7; index++) {
-        CPUANGLE[index] = 0
+        if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile0`)) {
+            CPUpos[index] = 1
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile1`)) {
+            CPUpos[index] = 2
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile2`)) {
+            CPUpos[index] = 0
+        }
+        if (0 == 0) {
+        	
+        }
+        CPUANGLE[index] = heading
         CPUPX[index] = CPUPX[index] + Math.sin(CPUANGLE[index] * Math.PI / 180)
         CPUPY[index] = CPUPY[index] + (0 - Math.cos(CPUANGLE[index] * Math.PI / 180))
     }
