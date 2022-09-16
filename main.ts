@@ -36,12 +36,12 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
             carYOffset += 0.16
             pause(1)
         }
+        if (controller.left.isPressed()) {
+            drift = "l"
+        } else if (controller.right.isPressed()) {
+            drift = "r"
+        }
     })
-    if (controller.left.isPressed()) {
-        drift = "l"
-    } else if (controller.right.isPressed()) {
-        drift = "r"
-    }
 })
 function configure () {
     renderer.setBackgroundImage(assets.image`background`)
@@ -72,14 +72,13 @@ let fwdY = 0
 let fwdX = 0
 let carPower = 0
 let coinRotation = 0
-let tempY = 0
-let tempX = 0
-let dis = 0
+let Max = 0
 let mirroring = false
 let drift = ""
 let carYOffset = 0
 let treeY: number[] = []
 let treeX: number[] = []
+let dis = 0
 let objtype: Image[] = []
 let objh: number[] = []
 let objy: number[] = []
@@ -94,7 +93,6 @@ configure()
 let arrayx2: number[] = []
 let arrayy2: number[] = []
 let arrayh2: number[] = []
-game.splash("Please Wait...", "A Few Seconds")
 let carAngularVelocity = 0
 let throttle = 0
 let py = 0
@@ -433,6 +431,33 @@ let CPUSpeed = [
 0,
 0
 ]
+CPUSpeed = [
+0,
+0,
+0,
+0,
+0,
+0,
+0
+]
+let CPUTempX = [
+0,
+0,
+0,
+0,
+0,
+0,
+0
+]
+let CPUTempY = [
+0,
+0,
+0,
+0,
+0,
+0,
+0
+]
 for (let value of tiles.getTilesByType(assets.tile`myTile3`)) {
     for (let index = 0; index <= 7; index++) {
         if (index < 4) {
@@ -450,6 +475,17 @@ for (let value of tiles.getTilesByType(assets.tile`myTile3`)) {
 for (let value of tiles.getTilesByType(assets.tile`myTile`)) {
     coinXMap.push(value.x + 0)
     coinYMap.push(value.y + 0)
+}
+for (let index = 0; index <= 7; index++) {
+    dis = 99999
+    for (let value of tiles.getTilesByType(assets.tile`myTile1`)) {
+        if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
+            dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
+            CPUTempX[index] = value.x
+            CPUTempY[index] = value.y
+        }
+    }
+    CPUpos[index] = 1
 }
 renderer.setUp(drawSprites)
 renderer.placePlayerSprite(carSprite, 12, 17)
@@ -620,44 +656,47 @@ game.onUpdate(function () {
     }
     for (let index = 0; index <= 7; index++) {
         if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile0`)) {
+            if (CPUpos[index] == 0) {
+                dis = 99999
+                for (let value of tiles.getTilesByType(assets.tile`myTile1`)) {
+                    if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
+                        dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
+                        CPUTempX[index] = value.x
+                        CPUTempY[index] = value.y
+                    }
+                }
+            }
             CPUpos[index] = 1
         } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile1`)) {
+            if (CPUpos[index] == 1) {
+                dis = 99999
+                for (let value of tiles.getTilesByType(assets.tile`myTile2`)) {
+                    if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
+                        dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
+                        CPUTempX[index] = value.x
+                        CPUTempY[index] = value.y
+                    }
+                }
+            }
             CPUpos[index] = 2
         } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile2`)) {
+            if (CPUpos[index] == 2) {
+                dis = 99999
+                for (let value of tiles.getTilesByType(assets.tile`myTile0`)) {
+                    if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
+                        dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
+                        CPUTempX[index] = value.x
+                        CPUTempY[index] = value.y
+                    }
+                }
+            }
             CPUpos[index] = 0
         }
-        if (CPUpos[index] == 0) {
-            dis = 99999
-            for (let value of tiles.getTilesByType(assets.tile`myTile0`)) {
-                if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
-                    dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
-                    tempX = value.x
-                    tempY = value.y
-                }
-            }
-        } else if (CPUpos[index] == 1) {
-            dis = 99999
-            for (let value of tiles.getTilesByType(assets.tile`myTile1`)) {
-                if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
-                    dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
-                    tempX = value.x
-                    tempY = value.y
-                }
-            }
-        } else if (CPUpos[index] == 2) {
-            dis = 99999
-            for (let value of tiles.getTilesByType(assets.tile`myTile2`)) {
-                if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
-                    dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
-                    tempX = value.x
-                    tempY = value.y
-                }
-            }
-        }
-        CPUAngle[index] = spriteutils.radiansToDegrees(Math.atan2((tempY - CPUPY[index]) / Math.max(Math.abs(tempY - CPUPY[index]), Math.abs(tempX - CPUPX[index])), (tempX - CPUPX[index]) / Math.max(Math.abs(tempY - CPUPY[index]), Math.abs(tempX - CPUPX[index])))) + 90
         CPUSpeed[index] = 2
-        CPUPX[index] = CPUPX[index] + (tempX - CPUPX[index]) / Math.max(Math.abs(tempY - CPUPY[index]), Math.abs(tempX - CPUPX[index])) * CPUSpeed[index]
-        CPUPY[index] = CPUPY[index] + (tempY - CPUPY[index]) / Math.max(Math.abs(tempY - CPUPY[index]), Math.abs(tempX - CPUPX[index])) * CPUSpeed[index]
+        Max = Math.max(Math.abs(CPUTempY[index] - CPUPY[index]), Math.abs(CPUTempX[index] - CPUPX[index]))
+        CPUPX[index] = CPUPX[index] + Math.idiv(CPUTempX[index] - CPUPX[index], Max) * CPUSpeed[index]
+        CPUPY[index] = CPUPY[index] + Math.idiv(CPUTempY[index] - CPUPY[index], Max) * CPUSpeed[index]
+        CPUAngle[index] = spriteutils.radiansToDegrees(Math.atan2((CPUTempY[index] - CPUPY[index]) / Math.max(Math.abs(CPUTempY[index] - CPUPY[index]), Math.abs(CPUTempX[index] - CPUPX[index])), (CPUTempX[index] - CPUPX[index]) / Math.max(Math.abs(CPUTempY[index] - CPUPY[index]), Math.abs(CPUTempX[index] - CPUPX[index])))) + 90
     }
     for (let index = 0; index <= coinXMap.length; index++) {
         for (let index7 = 0; index7 <= coinX.length / 2; index7++) {
