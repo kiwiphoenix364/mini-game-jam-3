@@ -135,6 +135,17 @@ function place () {
             }
         }
     }
+    for (let index = 0; index <= 7; index++) {
+        dis = 99999
+        for (let value of tiles.getTilesByType(assets.tile`myTile1`)) {
+            if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
+                dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
+                CPUTempX[index] = value.x
+                CPUTempY[index] = value.y
+            }
+        }
+        CPUpos[index] = 1
+    }
     timer.background(function () {
         for (let index = 0; index < 90; index++) {
             pause(1)
@@ -156,7 +167,8 @@ function Start_LVL (LVL_NUM: number) {
     throttle = 0
     let py = 0
 let px = 0
-pxPrev = px
+speedMult = 1
+    pxPrev = px
     pyPrev = py
     // How far behind the player should the camera be placed?
     followDistance = 40
@@ -525,17 +537,6 @@ for (let value of tiles.getTilesByType(assets.tile`myTile`)) {
             `)
         objIdx.push(1)
     }
-    for (let index = 0; index <= 7; index++) {
-        dis = 99999
-        for (let value of tiles.getTilesByType(assets.tile`myTile1`)) {
-            if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
-                dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
-                CPUTempX[index] = value.x
-                CPUTempY[index] = value.y
-            }
-        }
-        CPUpos[index] = 1
-    }
     place()
 }
 controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
@@ -544,6 +545,13 @@ controller.menu.onEvent(ControllerButtonEvent.Pressed, function () {
 controller.B.onEvent(ControllerButtonEvent.Released, function () {
     drift = ""
     driftNum = 0
+    timer.background(function () {
+        speedMult = 1.5
+        pause(1000)
+        if (speedMult == 1.5) {
+            speedMult = 1
+        }
+    })
 })
 let coinRotation = 0
 let Max = 0
@@ -554,6 +562,7 @@ let carVx = 0
 let fwdY = 0
 let fwdX = 0
 let carPower = 0
+let speedMult = 0
 let driftNum = 0
 let mirroring = false
 let cameraOffset = 0
@@ -1022,9 +1031,9 @@ game.onUpdate(function () {
             fwdY = 0 - Math.cos(heading * Math.PI / 180)
         }
         if (tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile6`)) {
-            carPower = controller.dy(-3)
+            carPower = controller.dy(-3) * speedMult
         } else {
-            carPower = controller.dy(-5)
+            carPower = controller.dy(-5) * speedMult
         }
         carVx += carPower * 2 * fwdX
         carVy += carPower * 2 * fwdY
