@@ -1523,6 +1523,7 @@ game.onUpdate(function () {
 })
 game.onUpdateInterval(700, function () {
     timer.background(function () {
+        placement = Math.constrain(placement, 1, 8)
         info.setScore(placement)
         placement = 1
         for (let index = 0; index <= 6; index++) {
