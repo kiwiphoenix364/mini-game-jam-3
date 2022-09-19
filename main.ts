@@ -31,14 +31,14 @@ controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
             carYOffset += -0.16
             pause(1)
         }
-        for (let index = 0; index < 20; index++) {
-            carYOffset += 0.16
-            pause(1)
-        }
         if (controller.left.isPressed()) {
             drift = "l"
         } else if (controller.right.isPressed()) {
             drift = "r"
+        }
+        for (let index = 0; index < 20; index++) {
+            carYOffset += 0.16
+            pause(1)
         }
     })
 })
@@ -118,6 +118,9 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
         }
     }
 })
+function endRace () {
+	
+}
 function place () {
     for (let value of tiles.getTilesByType(assets.tile`myTile3`)) {
         for (let index = 0; index <= 7; index++) {
@@ -141,7 +144,7 @@ function place () {
             if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
                 dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
                 CPUTempX[index] = value.x
-                CPUTempY[index] = value.y
+                CPUCheckPoints[index] = value.y
             }
         }
         CPUpos[index] = 1
@@ -386,7 +389,16 @@ speedMult = 1
     0,
     0
     ]
-    CPUTempY = [
+    CPUCounter = [
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7
+    ]
+    CPULapCount = [
     0,
     0,
     0,
@@ -395,6 +407,16 @@ speedMult = 1
     0,
     0
     ]
+    CPUCP1 = [
+    assets.tile`myTile9`,
+    assets.tile`myTile9`,
+    assets.tile`myTile9`,
+    assets.tile`myTile9`,
+    assets.tile`myTile9`,
+    assets.tile`myTile9`,
+    assets.tile`myTile9`
+    ]
+    PlayerCP = 7
     renderer.placePlayerSprite(carSprite, 12, 17)
 renderer.setUp(drawSprites)
 for (let value of tiles.getTilesByType(assets.tile`myTile`)) {
@@ -553,6 +575,13 @@ controller.B.onEvent(ControllerButtonEvent.Released, function () {
         }
     })
 })
+let dis3 = 0
+let placement = 0
+let playerPlacementNum = 0
+let dis2 = 0
+let cp2: Image = null
+let cp1: Image = null
+let PlayerLapCount = 0
 let coinRotation = 0
 let Max = 0
 let prevAngle = 0
@@ -562,6 +591,10 @@ let carVx = 0
 let fwdY = 0
 let fwdX = 0
 let carPower = 0
+let PlayerCP = 0
+let CPUCP1: Image[] = []
+let CPULapCount: number[] = []
+let CPUCounter: number[] = []
 let speedMult = 0
 let driftNum = 0
 let mirroring = false
@@ -571,7 +604,7 @@ let carYOffset = 0
 let treeY: number[] = []
 let treeX: number[] = []
 let dis = 0
-let CPUTempY: number[] = []
+let CPUCheckPoints: number[] = []
 let CPUTempX: number[] = []
 let CPUSpeed: number[] = []
 let CPUpos: number[] = []
@@ -980,7 +1013,7 @@ CPUTempX = [
 0,
 0
 ]
-CPUTempY = [
+CPUCheckPoints = [
 0,
 0,
 0,
@@ -999,7 +1032,7 @@ for (let index = 0; index <= 7; index++) {
         if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
             dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
             CPUTempX[index] = value.x
-            CPUTempY[index] = value.y
+            CPUCheckPoints[index] = value.y
         }
     }
     CPUpos[index] = 1
@@ -1304,7 +1337,7 @@ game.onUpdate(function () {
                         if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
                             dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
                             CPUTempX[index] = value.x
-                            CPUTempY[index] = value.y
+                            CPUCheckPoints[index] = value.y
                         }
                     }
                 }
@@ -1316,7 +1349,7 @@ game.onUpdate(function () {
                         if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
                             dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
                             CPUTempX[index] = value.x
-                            CPUTempY[index] = value.y
+                            CPUCheckPoints[index] = value.y
                         }
                     }
                 }
@@ -1328,16 +1361,16 @@ game.onUpdate(function () {
                         if (dis > Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))) {
                             dis = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
                             CPUTempX[index] = value.x
-                            CPUTempY[index] = value.y
+                            CPUCheckPoints[index] = value.y
                         }
                     }
                 }
                 CPUpos[index] = 0
             }
-            Max = Math.max(Math.abs(CPUTempY[index] - CPUPY[index]), Math.abs(CPUTempX[index] - CPUPX[index]))
+            Max = Math.max(Math.abs(CPUCheckPoints[index] - CPUPY[index]), Math.abs(CPUTempX[index] - CPUPX[index]))
             CPUPX[index] = CPUPX[index] + (CPUTempX[index] - CPUPX[index]) / (Max / CPUSpeed[index])
-            CPUPY[index] = CPUPY[index] + (CPUTempY[index] - CPUPY[index]) / (Max / CPUSpeed[index])
-            CPUAngle[index] = spriteutils.radiansToDegrees(Math.atan2((CPUTempY[index] - CPUPY[index]) / Math.max(Math.abs(CPUTempY[index] - CPUPY[index]), Math.abs(CPUTempX[index] - CPUPX[index])), (CPUTempX[index] - CPUPX[index]) / Math.max(Math.abs(CPUTempY[index] - CPUPY[index]), Math.abs(CPUTempX[index] - CPUPX[index])))) + 90
+            CPUPY[index] = CPUPY[index] + (CPUCheckPoints[index] - CPUPY[index]) / (Max / CPUSpeed[index])
+            CPUAngle[index] = spriteutils.radiansToDegrees(Math.atan2((CPUCheckPoints[index] - CPUPY[index]) / Math.max(Math.abs(CPUCheckPoints[index] - CPUPY[index]), Math.abs(CPUTempX[index] - CPUPX[index])), (CPUTempX[index] - CPUPX[index]) / Math.max(Math.abs(CPUCheckPoints[index] - CPUPY[index]), Math.abs(CPUTempX[index] - CPUPX[index])))) + 90
         }
         for (let index = 0; index <= coinXMap.length; index++) {
             for (let index7 = 0; index7 <= coinX.length / 2; index7++) {
@@ -1393,4 +1426,130 @@ game.onUpdate(function () {
         }
         coinRotation += 1
     }
+})
+game.onUpdate(function () {
+    if (tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile`)) {
+    	
+    }
+    if (tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile9`)) {
+        if (PlayerCP == 7) {
+            if (PlayerLapCount < 100) {
+                PlayerLapCount += 1
+            } else {
+                endRace()
+            }
+        }
+        PlayerCP = 0
+        cp1 = assets.tile`myTile11`
+        cp2 = assets.tile`myTile12`
+    } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile11`) || tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile12`)) {
+        PlayerCP = 1
+        cp1 = assets.tile`myTile13`
+        cp2 = assets.tile`myTile14`
+    } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile13`) || tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile14`)) {
+        PlayerCP = 2
+        cp1 = assets.tile`myTile15`
+        cp2 = assets.tile`myTile16`
+    } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile15`) || tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile16`)) {
+        PlayerCP = 3
+        cp1 = assets.tile`myTile17`
+        cp2 = assets.tile`myTile18`
+    } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile17`) || tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile18`)) {
+        PlayerCP = 4
+        cp1 = assets.tile`myTile19`
+        cp2 = assets.tile`myTile20`
+    } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile19`) || tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile20`)) {
+        PlayerCP = 5
+        cp1 = assets.tile`myTile21`
+        cp2 = assets.tile`myTile22`
+    } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile21`) || tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile22`)) {
+        PlayerCP = 6
+        cp1 = assets.tile`myTile23`
+        cp2 = assets.tile`myTile24`
+    } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile23`) || tiles.tileAtLocationEquals(tiles.getTileLocation(px / 16, py / 16), assets.tile`myTile24`)) {
+        PlayerCP = 7
+        cp1 = assets.tile`myTile9`
+        cp2 = assets.tile`myTile9`
+    } else {
+    	
+    }
+    dis2 = 99999
+    for (let value of tiles.getTilesByType(cp1)) {
+        if (dis2 > Math.sqrt((px - value.x) * (px - value.x) + (py - value.y) * (py - value.y))) {
+            dis2 = Math.sqrt((px - value.x) * (px - value.x) + (py - value.y) * (py - value.y))
+        }
+    }
+    for (let value of tiles.getTilesByType(cp2)) {
+        if (dis2 > Math.sqrt((px - value.x) * (px - value.x) + (py - value.y) * (py - value.y))) {
+            dis2 = Math.sqrt((px - value.x) * (px - value.x) + (py - value.y) * (py - value.y))
+        }
+    }
+    playerPlacementNum = (7 - PlayerCP) * 1000 + dis2 + (3 - PlayerLapCount) * 10000
+    for (let index = 0; index <= 6; index++) {
+        if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile9`)) {
+            if (CPUCounter[index] == 7) {
+                if (CPULapCount[index] < 100) {
+                    CPULapCount[index] = CPULapCount[index] + 1
+                }
+            }
+            CPUCounter[index] = 0
+            CPUCP1[index] = assets.tile`myTile11`
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile11`) || tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile12`)) {
+            CPUCounter[index] = 1
+            CPUCP1[index] = assets.tile`myTile13`
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile13`) || tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile14`)) {
+            CPUCounter[index] = 2
+            CPUCP1[index] = assets.tile`myTile15`
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile15`) || tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile16`)) {
+            CPUCounter[index] = 3
+            CPUCP1[index] = assets.tile`myTile17`
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile17`) || tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile18`)) {
+            CPUCounter[index] = 4
+            CPUCP1[index] = assets.tile`myTile19`
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile19`) || tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile20`)) {
+            CPUCounter[index] = 5
+            CPUCP1[index] = assets.tile`myTile21`
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile21`) || tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile22`)) {
+            CPUCounter[index] = 6
+            CPUCP1[index] = assets.tile`myTile23`
+        } else if (tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile23`) || tiles.tileAtLocationEquals(tiles.getTileLocation(CPUPX[index] / 16, CPUPY[index] / 16), assets.tile`myTile24`)) {
+            CPUCounter[index] = 7
+            CPUCP1[index] = assets.tile`myTile9`
+        }
+    }
+})
+game.onUpdate(function () {
+	
+})
+game.onUpdateInterval(700, function () {
+    timer.background(function () {
+        placement = 1
+        for (let index = 0; index <= 6; index++) {
+            dis2 = 99999
+            for (let value of tiles.getTilesByType(CPUCP1[index])) {
+                dis3 = Math.sqrt((CPUPX[index] - value.x) * (CPUPX[index] - value.x) + (CPUPY[index] - value.y) * (CPUPY[index] - value.y))
+                if (dis2 > dis3) {
+                    dis2 = dis3
+                }
+            }
+            if (playerPlacementNum > (7 - CPUCounter[index]) * 1000 + dis2 + (3 - CPULapCount[index]) * 10000) {
+                placement += 1
+                if (CPUSpeed[index] > 1) {
+                    CPUSpeed[index] = CPUSpeed[index] - 0.001
+                }
+            } else {
+                if (CPUSpeed[index] < 3) {
+                    CPUSpeed[index] = CPUSpeed[index] + 0.001
+                }
+            }
+            pause(100)
+        }
+    })
+    info.setScore(placement)
+})
+forever(function () {
+	
+})
+game.onUpdateInterval(500, function () {
+	
 })
