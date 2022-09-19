@@ -1523,6 +1523,7 @@ game.onUpdate(function () {
 })
 game.onUpdateInterval(700, function () {
     timer.background(function () {
+        info.setScore(placement)
         placement = 1
         for (let index = 0; index <= 6; index++) {
             dis2 = 99999
@@ -1545,7 +1546,6 @@ game.onUpdateInterval(700, function () {
             pause(100)
         }
     })
-    info.setScore(placement)
 })
 forever(function () {
 	
